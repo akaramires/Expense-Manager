@@ -10,4 +10,21 @@
     <string name="fragment_orders">Счета</string>
     <string name="fragment_budgets">Бюджеты</string>
     <string name="fragment_reports">Отчеты</string>
+
+    <string name="lblExpenseType">Тип</string>
+    <string-array name="lblExpenseTypes">
+        <item>Расход</item>
+        <item>Доход</item>
+    </string-array>
+    <string name="lblDate">Дата</string>
+    <string name="lblSource">Источник</string>
+    <string name="lblCount">Количество</string>
+    <string name="lblCost">Сумма за единицу</string>
+    <string name="lblTitle">Заголовок</string>
+    <string name="lblComment">Комментарий</string>
+    <string name="lblTotal">Итого</string>
+
+    <string name="action_save">Cохранить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_clear">Очистить</string>
 </resources>

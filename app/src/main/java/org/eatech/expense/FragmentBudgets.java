@@ -17,7 +17,7 @@ public class FragmentBudgets extends Fragment
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
-        View rootView = inflater.inflate(R.layout.fragment_form, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_common, container, false);
 
         return rootView;
     }
