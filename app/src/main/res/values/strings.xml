@@ -5,4 +5,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="fragment_form">Добавить</string>
+    <string name="fragment_list">Операции</string>
+    <string name="fragment_orders">Счета</string>
+    <string name="fragment_budgets">Бюджеты</string>
+    <string name="fragment_reports">Отчеты</string>
 </resources>
