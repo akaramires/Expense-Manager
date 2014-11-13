@@ -31,9 +31,12 @@ import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
-public class FragmentForm extends SherlockFragment implements View.OnClickListener
+public class FragmentForm extends SherlockFragment
 {
+    private static final String TAG = "EXPENSE-" + FragmentForm.class.getSimpleName();
+
     @InjectView(R.id.spinExpenseType)
     Spinner spinExpenseType;
 
@@ -43,7 +46,6 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
     private SimpleDateFormat dateFormatter;
 
     private DatePickerDialog datePickerDialog;
-    private static final String TAG = "EXPENSE-" + FragmentForm.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -51,15 +53,6 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
     {
         View rootView = inflater.inflate(R.layout.fragment_form, container, false);
         ButterKnife.inject(this, rootView);
-
-        String[] data = getResources().getStringArray(R.array.lblExpenseTypes);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, data);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinExpenseType.setAdapter(adapter);
-        spinExpenseType.setPrompt(getString(R.string.lblExpenseType));
-        spinExpenseType.setSelection(0);
 
         setHasOptionsMenu(true);
         return rootView;
@@ -70,9 +63,16 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
     {
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
 
+        String[] data = getResources().getStringArray(R.array.lblExpenseTypes);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, data);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinExpenseType.setAdapter(adapter);
+        spinExpenseType.setPrompt(getString(R.string.lblExpenseType));
+        spinExpenseType.setSelection(0);
+
         etDate.setInputType(InputType.TYPE_NULL);
-        etDate.requestFocus();
-        etDate.setOnClickListener(this);
         etDate.setText(dateFormatter.format(new Date().getTime()));
 
         Calendar maxDate;
@@ -92,7 +92,12 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        inflater.inflate(R.menu.menu_form, menu);
+        menu.add(getString(R.string.action_save))
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+        menu.add(getString(R.string.action_cancel))
+            .setIcon(R.drawable.ic_action_cancel)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -107,7 +112,7 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
 
     }
 
-    @Override
+    @OnClick(R.id.etDate)
     public void onClick(View view)
     {
         datePickerDialog.show();
