@@ -7,7 +7,6 @@ package org.eatech.expense;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+
+import org.eatech.expense.adapter.RangeDatePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -41,6 +43,7 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
     private SimpleDateFormat dateFormatter;
 
     private DatePickerDialog datePickerDialog;
+    private static final String TAG = "EXPENSE-" + FragmentForm.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -72,8 +75,9 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
         etDate.setOnClickListener(this);
         etDate.setText(dateFormatter.format(new Date().getTime()));
 
-        Calendar newCalendar = Calendar.getInstance();
-        datePickerDialog = new DatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
+        Calendar maxDate;
+        Calendar current = maxDate = Calendar.getInstance();
+        datePickerDialog = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
         {
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
@@ -82,9 +86,7 @@ public class FragmentForm extends SherlockFragment implements View.OnClickListen
                 newDate.set(year, monthOfYear, dayOfMonth);
                 etDate.setText(dateFormatter.format(newDate.getTime()));
             }
-
-        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
-        datePickerDialog.getDatePicker().setMaxDate(new Date().getTime());
+        }, current, null, maxDate);
     }
 
     @Override
