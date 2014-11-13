@@ -11,8 +11,8 @@
     <string name="fragment_budgets">Бюджеты</string>
     <string name="fragment_reports">Отчеты</string>
 
-    <string name="lblExpenseType">Тип</string>
-    <string-array name="lblExpenseTypes">
+    <string name="lblType">Тип</string>
+    <string-array name="lblTypes">
         <item>Расход</item>
         <item>Доход</item>
     </string-array>
@@ -20,11 +20,16 @@
     <string name="lblSource">Источник</string>
     <string name="lblCount">Количество</string>
     <string name="lblCost">Сумма за единицу</string>
-    <string name="lblTitle">Заголовок</string>
+    <string name="lblDestination">Назначение</string>
     <string name="lblComment">Комментарий</string>
     <string name="lblTotal">Итого</string>
 
     <string name="action_save">Cохранить</string>
     <string name="action_cancel">Отмена</string>
     <string name="action_clear">Очистить</string>
+
+    <string name="msgValidationCount">Количество не может быть меньше 1</string>
+    <string name="msgValidationCost">Сумма не может быть меньше 0,01</string>
+    <string name="msgValidationSource">Пожалуйста выберите источник</string>
+    <string name="msgValidationDestination">Пожалуйста выберите назначение</string>
 </resources>

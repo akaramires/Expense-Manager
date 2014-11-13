@@ -15,12 +15,15 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NumberRule;
+import com.mobsandgeeks.saripaar.annotation.Required;
+import com.mobsandgeeks.saripaar.annotation.Select;
 
 import org.eatech.expense.adapter.RangeDatePickerDialog;
 
@@ -37,15 +40,36 @@ public class FragmentForm extends SherlockFragment
 {
     private static final String TAG = "EXPENSE-" + FragmentForm.class.getSimpleName();
 
-    @InjectView(R.id.spinExpenseType)
+    @InjectView(R.id.spinType)
     Spinner spinExpenseType;
 
     @InjectView(R.id.etDate)
     EditText etDate;
 
+    @InjectView(R.id.spinSource)
+    @Required(order = 1)
+    @Select(order = 2, defaultSelection = 0, messageResId = R.string.msgValidationSource)
+    Spinner spinSource;
+
+    @InjectView(R.id.spinDestination)
+    @Required(order = 3)
+    @Select(order = 4, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
+    Spinner spinDestination;
+
+    @InjectView(R.id.etCount)
+    @Required(order = 5)
+    @NumberRule(order = 6, type = NumberRule.NumberType.INTEGER, gt = 1, messageResId = R.string.msgValidationCount)
+    EditText etCount;
+
+    @InjectView(R.id.etCost)
+    @Required(order = 7)
+    @NumberRule(order = 8, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
+    EditText etCost;
+
     private SimpleDateFormat dateFormatter;
 
     private DatePickerDialog datePickerDialog;
+    private Validator        validator;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -53,6 +77,9 @@ public class FragmentForm extends SherlockFragment
     {
         View rootView = inflater.inflate(R.layout.fragment_form, container, false);
         ButterKnife.inject(this, rootView);
+
+        validator = new Validator(this);
+        validator.setValidationListener(new FragmentFormListeners());
 
         setHasOptionsMenu(true);
         return rootView;
@@ -63,17 +90,25 @@ public class FragmentForm extends SherlockFragment
     {
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
 
-        String[] data = getResources().getStringArray(R.array.lblExpenseTypes);
+        String[] data = getResources().getStringArray(R.array.lblTypes);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, data);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         spinExpenseType.setAdapter(adapter);
-        spinExpenseType.setPrompt(getString(R.string.lblExpenseType));
         spinExpenseType.setSelection(0);
 
         etDate.setInputType(InputType.TYPE_NULL);
         etDate.setText(dateFormatter.format(new Date().getTime()));
+
+        ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, new String[] { getString(R.string.msgValidationSource) });
+        adapterSource.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinSource.setAdapter(adapterSource);
+        spinSource.setSelection(0);
+
+        ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, new String[] { getString(R.string.msgValidationDestination) });
+        adapterDestination.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinDestination.setAdapter(adapterDestination);
+        spinDestination.setSelection(0);
 
         Calendar maxDate;
         Calendar current = maxDate = Calendar.getInstance();
@@ -92,12 +127,7 @@ public class FragmentForm extends SherlockFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        menu.add(getString(R.string.action_save))
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-        menu.add(getString(R.string.action_cancel))
-            .setIcon(R.drawable.ic_action_cancel)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
+        inflater.inflate(R.menu.menu_form, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -105,7 +135,8 @@ public class FragmentForm extends SherlockFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-            case android.R.id.home:
+            case R.id.menuItemSave:
+                validator.validateAsync();
                 break;
         }
         return true;

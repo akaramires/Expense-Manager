@@ -17,7 +17,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:text="@string/lblExpenseType"
+                android:text="@string/lblType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/blue"
@@ -25,7 +25,7 @@
                 android:paddingRight="10dp"/>
 
             <Spinner
-                android:id="@+id/spinExpenseType"
+                android:id="@+id/spinType"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -71,6 +71,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+
             <Spinner
                 android:id="@+id/spinSource"
                 android:layout_width="match_parent"
@@ -85,6 +86,7 @@
                 android:layout_weight="1"/>
 
         </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -93,7 +95,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:text="@string/lblTitle"
+            android:text="@string/lblDestination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/blue"
@@ -105,10 +107,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <EditText
-                android:id="@+id/etTitle"
+            <Spinner
+                android:id="@+id/spinDestination"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+
+
+            <EditText
+                android:id="@+id/etDestination"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:inputType="none"
                 android:layout_weight="1"/>
 
             <ImageButton
