@@ -29,10 +29,16 @@ import com.mobsandgeeks.saripaar.annotation.Select;
 import org.eatech.expense.R;
 import org.eatech.expense.SourceActivity;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
+import org.eatech.expense.db.DatabaseHelper;
+import org.eatech.expense.db.HelperFactory;
+import org.eatech.expense.db.entities.SourceEntity;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import butterknife.ButterKnife;
@@ -41,7 +47,7 @@ import butterknife.OnClick;
 
 public class FragmentForm extends SherlockFragment
 {
-    private static final String TAG = "EXPENSE-" + FragmentForm.class.getSimpleName();
+    private static final String TAG = "Expense-" + FragmentForm.class.getSimpleName();
 
     @InjectView(R.id.spinType)
     Spinner spinType;
@@ -82,6 +88,7 @@ public class FragmentForm extends SherlockFragment
 
     private DatePickerDialog datePickerDialog;
     private Validator        validator;
+    private DatabaseHelper   dbHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -90,9 +97,6 @@ public class FragmentForm extends SherlockFragment
         View rootView = inflater.inflate(R.layout.fragment_form, container, false);
         ButterKnife.inject(this, rootView);
 
-        validator = new Validator(this);
-        validator.setValidationListener(new FragmentFormListeners());
-
         setHasOptionsMenu(true);
         return rootView;
     }
@@ -100,10 +104,19 @@ public class FragmentForm extends SherlockFragment
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
+        validator = new Validator(this);
+        validator.setValidationListener(new FragmentFormListeners());
+
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         current = maxDate = Calendar.getInstance();
 
-        setupForm();
+        dbHelper = HelperFactory.getInstance().getHelper();
+
+        try {
+            setupForm();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -149,39 +162,12 @@ public class FragmentForm extends SherlockFragment
     {
     }
 
-    private void setupForm()
+    private void setupForm() throws SQLException
     {
-        String[] typesList = getResources().getStringArray(R.array.lblTypes);
-        String[] sourceList = new String[] { getString(R.string.msgValidationSource) };
-        String[] destinationList = new String[] { getString(R.string.msgValidationDestination) };
-
-        etDate.setText(dateFormatter.format(new Date().getTime()));
-
-        ArrayAdapter<String> adapterType = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, typesList);
-        adapterType.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-        spinType.setAdapter(adapterType);
-        spinType.setSelection(0);
-
-        ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, sourceList);
-        adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-        spinSource.setAdapter(adapterSource);
-        spinSource.setSelection(0);
-
-        ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, destinationList);
-        adapterDestination.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-        spinDestination.setAdapter(adapterDestination);
-        spinDestination.setSelection(0);
-
-        datePickerDialog = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
-        {
-
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-            {
-                Calendar newDate = Calendar.getInstance();
-                newDate.set(year, monthOfYear, dayOfMonth);
-                etDate.setText(dateFormatter.format(newDate.getTime()));
-            }
-        }, current, null, maxDate);
+        setupTypeAdapter();
+        setupSourceAdapter();
+        setupDestinationAdapter();
+        setupDate();
     }
 
     private void clearForm()
@@ -193,5 +179,57 @@ public class FragmentForm extends SherlockFragment
         etCount.setText("");
         etCost.setText("");
         etComment.setText("");
+    }
+
+    private void setupSourceAdapter() throws SQLException
+    {
+        ArrayList<String> sourceList = new ArrayList<String>();
+        sourceList.add(getString(R.string.msgValidationSource));
+
+        List<SourceEntity> sources = dbHelper.getSourceDAO().getAll();
+        for (SourceEntity source : sources) {
+            sourceList.add(source.getTitle());
+        }
+
+        ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, sourceList);
+        adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+        spinSource.setAdapter(adapterSource);
+        spinSource.setSelection(0);
+
+    }
+
+    private void setupTypeAdapter()
+    {
+        String[] typesList = getResources().getStringArray(R.array.lblTypes);
+
+        ArrayAdapter<String> adapterType = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, typesList);
+        adapterType.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+        spinType.setAdapter(adapterType);
+        spinType.setSelection(0);
+    }
+
+    private void setupDestinationAdapter()
+    {
+        String[] destinationList = new String[] { getString(R.string.msgValidationDestination) };
+
+        ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, destinationList);
+        adapterDestination.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+        spinDestination.setAdapter(adapterDestination);
+        spinDestination.setSelection(0);
+    }
+
+    private void setupDate()
+    {
+        etDate.setText(dateFormatter.format(new Date().getTime()));
+        datePickerDialog = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
+        {
+
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+            {
+                Calendar newDate = Calendar.getInstance();
+                newDate.set(year, monthOfYear, dayOfMonth);
+                etDate.setText(dateFormatter.format(newDate.getTime()));
+            }
+        }, current, null, maxDate);
     }
 }

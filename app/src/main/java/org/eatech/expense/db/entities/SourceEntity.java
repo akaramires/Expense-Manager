@@ -24,7 +24,7 @@ public class SourceEntity
     private int Id;
 
     @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = COL_TITLE)
-    private int title;
+    private String title;
 
     @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = COL_SUM_START)
     private String sum_start;
@@ -42,7 +42,7 @@ public class SourceEntity
     {
     }
 
-    public SourceEntity(int title, String sum_start, String sum_current, long created_at,
+    public SourceEntity(String title, String sum_start, String sum_current, long created_at,
                         CurrencyEntity currency)
     {
         this.title = title;
@@ -52,7 +52,7 @@ public class SourceEntity
         this.currency = currency;
     }
 
-    public SourceEntity(int id, int title, String sum_start, String sum_current, long created_at,
+    public SourceEntity(int id, String title, String sum_start, String sum_current, long created_at,
                         CurrencyEntity currency)
     {
         Id = id;
@@ -73,12 +73,12 @@ public class SourceEntity
         Id = id;
     }
 
-    public int getTitle()
+    public String getTitle()
     {
         return title;
     }
 
-    public void setTitle(int title)
+    public void setTitle(String title)
     {
         this.title = title;
     }

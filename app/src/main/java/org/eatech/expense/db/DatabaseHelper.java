@@ -27,7 +27,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
     private static final String TAG = "Expense-" + DatabaseHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME    = "expense.sqlite";
-    private static final int    DATABASE_VERSION = 2;
+    private static final int    DATABASE_VERSION = 3;
     private CurrencyDao currencyDao;
     private SourceDao   sourceDao;
 
