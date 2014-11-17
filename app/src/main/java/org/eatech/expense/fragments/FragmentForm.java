@@ -31,6 +31,7 @@ import org.eatech.expense.SourceActivity;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
 import org.eatech.expense.db.DatabaseHelper;
 import org.eatech.expense.db.HelperFactory;
+import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.SourceEntity;
 
 import java.sql.SQLException;
@@ -208,9 +209,15 @@ public class FragmentForm extends SherlockFragment
         spinType.setSelection(0);
     }
 
-    private void setupDestinationAdapter()
+    private void setupDestinationAdapter() throws SQLException
     {
-        String[] destinationList = new String[] { getString(R.string.msgValidationDestination) };
+        ArrayList<String> destinationList = new ArrayList<String>();
+        destinationList.add(getString(R.string.msgValidationDestination));
+
+        List<CategoryEntity> categories = dbHelper.getCategoryDAO().getAll();
+        for (CategoryEntity category : categories) {
+            destinationList.add(category.getTitle());
+        }
 
         ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, destinationList);
         adapterDestination.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);

@@ -13,7 +13,9 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import org.eatech.expense.db.dao.CategoryDao;
 import org.eatech.expense.db.dao.CurrencyDao;
+import org.eatech.expense.db.dao.DestinationDao;
 import org.eatech.expense.db.dao.SourceDao;
 import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.CurrencyEntity;
@@ -30,8 +32,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
     private static final String DATABASE_NAME    = "expense.sqlite";
     private static final int    DATABASE_VERSION = 4;
-    private CurrencyDao currencyDao;
-    private SourceDao   sourceDao;
+    private CurrencyDao    currencyDao;
+    private SourceDao      sourceDao;
+    private CategoryDao    categoryDao;
+    private DestinationDao destinationDao;
 
     public DatabaseHelper(Context context)
     {
@@ -89,6 +93,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
         try {
             TableUtils.dropTable(connectionSource, CurrencyEntity.class, true);
             TableUtils.dropTable(connectionSource, SourceEntity.class, true);
+            TableUtils.dropTable(connectionSource, CategoryEntity.class, true);
+            TableUtils.dropTable(connectionSource, DestinationEntity.class, true);
 
             onCreate(database, connectionSource);
         } catch (SQLException e) {
@@ -113,6 +119,24 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
         }
 
         return sourceDao;
+    }
+
+    public CategoryDao getCategoryDAO() throws SQLException
+    {
+        if (categoryDao == null) {
+            categoryDao = new CategoryDao(getConnectionSource(), CategoryEntity.class);
+        }
+
+        return categoryDao;
+    }
+
+    public DestinationDao getDestinationDAO() throws SQLException
+    {
+        if (destinationDao == null) {
+            destinationDao = new DestinationDao(getConnectionSource(), DestinationEntity.class);
+        }
+
+        return destinationDao;
     }
 
     @Override
