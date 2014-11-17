@@ -47,23 +47,27 @@ public class FragmentForm extends SherlockFragment
     EditText etDate;
 
     @InjectView(R.id.spinSource)
-    @Required(order = 1)
-    @Select(order = 2, defaultSelection = 0, messageResId = R.string.msgValidationSource)
+    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
     Spinner spinSource;
 
+    @InjectView(R.id.etSource)
+    EditText etSource;
+
     @InjectView(R.id.spinDestination)
-    @Required(order = 3)
-    @Select(order = 4, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
+    @Select(order = 2, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
     Spinner spinDestination;
 
+    @InjectView(R.id.etDestination)
+    EditText etDestination;
+
     @InjectView(R.id.etCount)
-    @Required(order = 5)
-    @NumberRule(order = 6, type = NumberRule.NumberType.INTEGER, gt = 1, messageResId = R.string.msgValidationCount)
+    @Required(order = 3)
+    @NumberRule(order = 4, type = NumberRule.NumberType.INTEGER, gt = 1, messageResId = R.string.msgValidationCount)
     EditText etCount;
 
     @InjectView(R.id.etCost)
-    @Required(order = 7)
-    @NumberRule(order = 8, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
+    @Required(order = 5)
+    @NumberRule(order = 6, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
     EditText etCost;
 
     private SimpleDateFormat dateFormatter;

@@ -33,19 +33,18 @@ public class FragmentFormListeners implements Validator.ValidationListener
             failedView.requestFocus();
             ((EditText) failedView).setError(message);
         } else if (failedView instanceof Spinner) {
+            ViewGroup parent = (ViewGroup) failedView.getParent();
+
             switch (failedView.getId()) {
                 case R.id.spinSource:
-//                    ViewGroup row = (ViewGroup) failedView.getParent();
-//                    for (int itemPos = 0; itemPos < row.getChildCount(); itemPos++) {
-//                        View childView = row.getChildAt(itemPos);
-//                        if (childView.getId() == R.id.etSource) {
-//                            ((EditText) childView).setError(message);
-//                            childView.requestFocus();
-//                            break;
-//                        }
-//                    }
+                    EditText etSource = (EditText) parent.findViewById(R.id.etSource);
+                    etSource.requestFocus();
+                    etSource.setError(message);
                     break;
                 case R.id.spinDestination:
+                    EditText etDestination = (EditText) parent.findViewById(R.id.etDestination);
+                    etDestination.requestFocus();
+                    etDestination.setError(message);
                     break;
             }
             Log.e(TAG, message);
