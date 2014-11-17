@@ -50,15 +50,9 @@ public class FragmentForm extends SherlockFragment
     @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
     Spinner spinSource;
 
-    @InjectView(R.id.etSource)
-    EditText etSource;
-
     @InjectView(R.id.spinDestination)
     @Select(order = 2, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
     Spinner spinDestination;
-
-    @InjectView(R.id.etDestination)
-    EditText etDestination;
 
     @InjectView(R.id.etCount)
     @Required(order = 3)
@@ -69,6 +63,9 @@ public class FragmentForm extends SherlockFragment
     @Required(order = 5)
     @NumberRule(order = 6, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
     EditText etCost;
+
+    @InjectView(R.id.etComment)
+    EditText etComment;
 
     private SimpleDateFormat dateFormatter;
 
@@ -94,6 +91,33 @@ public class FragmentForm extends SherlockFragment
     {
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
 
+        setupForm();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.menu_form, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+            case R.id.menuItemSave:
+                validator.validateAsync();
+                break;
+            case R.id.menuItemCancel:
+                clearForm();
+                break;
+        }
+
+        return true;
+    }
+
+    private void setupForm()
+    {
         String[] data = getResources().getStringArray(R.array.lblTypes);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, data);
@@ -128,23 +152,15 @@ public class FragmentForm extends SherlockFragment
         }, current, null, maxDate);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    private void clearForm()
     {
-        inflater.inflate(R.menu.menu_form, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId()) {
-            case R.id.menuItemSave:
-                validator.validateAsync();
-                break;
-        }
-        return true;
-
+        spinExpenseType.setSelection(0);
+        etDate.setText(dateFormatter.format(new Date().getTime()));
+        spinSource.setSelection(0);
+        spinDestination.setSelection(0);
+        etCount.setText("");
+        etCost.setText("");
+        etComment.setText("");
     }
 
     @OnClick(R.id.etDate)
