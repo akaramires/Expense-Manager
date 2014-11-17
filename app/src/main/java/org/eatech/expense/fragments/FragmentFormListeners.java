@@ -3,7 +3,7 @@
  * @copyright (C)Copyright 2014 e.abdurayimov@gmail.com
  */
 
-package org.eatech.expense;
+package org.eatech.expense.fragments;
 
 import android.util.Log;
 import android.view.View;
@@ -13,6 +13,8 @@ import android.widget.Spinner;
 
 import com.mobsandgeeks.saripaar.Rule;
 import com.mobsandgeeks.saripaar.Validator;
+
+import org.eatech.expense.R;
 
 public class FragmentFormListeners implements Validator.ValidationListener
 {

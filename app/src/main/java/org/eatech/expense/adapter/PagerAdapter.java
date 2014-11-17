@@ -10,11 +10,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import org.eatech.expense.FragmentBudgets;
-import org.eatech.expense.FragmentForm;
-import org.eatech.expense.FragmentOperations;
-import org.eatech.expense.FragmentOrders;
-import org.eatech.expense.FragmentReports;
+import org.eatech.expense.fragments.FragmentBudgets;
+import org.eatech.expense.fragments.FragmentForm;
+import org.eatech.expense.fragments.FragmentOperations;
+import org.eatech.expense.fragments.FragmentOrders;
+import org.eatech.expense.fragments.FragmentReports;
 import org.eatech.expense.R;
 
 public class PagerAdapter extends FragmentStatePagerAdapter

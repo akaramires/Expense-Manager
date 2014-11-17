@@ -3,17 +3,18 @@
  * @copyright (C)Copyright 2014 e.abdurayimov@gmail.com
  */
 
-package org.eatech.expense;
+package org.eatech.expense.fragments;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -25,6 +26,8 @@ import com.mobsandgeeks.saripaar.annotation.NumberRule;
 import com.mobsandgeeks.saripaar.annotation.Required;
 import com.mobsandgeeks.saripaar.annotation.Select;
 
+import org.eatech.expense.R;
+import org.eatech.expense.SourceActivity;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
 
 import java.text.SimpleDateFormat;
@@ -41,7 +44,7 @@ public class FragmentForm extends SherlockFragment
     private static final String TAG = "EXPENSE-" + FragmentForm.class.getSimpleName();
 
     @InjectView(R.id.spinType)
-    Spinner spinExpenseType;
+    Spinner spinType;
 
     @InjectView(R.id.etDate)
     EditText etDate;
@@ -67,7 +70,15 @@ public class FragmentForm extends SherlockFragment
     @InjectView(R.id.etComment)
     EditText etComment;
 
+    @InjectView(R.id.ibSource)
+    ImageButton ibSource;
+
+    @InjectView(R.id.ibDestination)
+    ImageButton ibDestination;
+
     private SimpleDateFormat dateFormatter;
+    private Calendar         maxDate;
+    private Calendar         current;
 
     private DatePickerDialog datePickerDialog;
     private Validator        validator;
@@ -90,6 +101,7 @@ public class FragmentForm extends SherlockFragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        current = maxDate = Calendar.getInstance();
 
         setupForm();
     }
@@ -116,30 +128,50 @@ public class FragmentForm extends SherlockFragment
         return true;
     }
 
+    @OnClick({ R.id.etDate, R.id.ibSource })
+    public void onClick(View view)
+    {
+        switch (view.getId()) {
+            case R.id.etDate:
+                datePickerDialog.show();
+                break;
+            case R.id.ibSource:
+                Intent intent = new Intent(getSherlockActivity(), SourceActivity.class);
+                startActivityForResult(intent, 1);
+                break;
+            case R.id.ibDestination:
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+    }
+
     private void setupForm()
     {
-        String[] data = getResources().getStringArray(R.array.lblTypes);
+        String[] typesList = getResources().getStringArray(R.array.lblTypes);
+        String[] sourceList = new String[] { getString(R.string.msgValidationSource) };
+        String[] destinationList = new String[] { getString(R.string.msgValidationDestination) };
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, data);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinExpenseType.setAdapter(adapter);
-        spinExpenseType.setSelection(0);
-
-        etDate.setInputType(InputType.TYPE_NULL);
         etDate.setText(dateFormatter.format(new Date().getTime()));
 
-        ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, new String[] { getString(R.string.msgValidationSource) });
-        adapterSource.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> adapterType = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, typesList);
+        adapterType.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+        spinType.setAdapter(adapterType);
+        spinType.setSelection(0);
+
+        ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, sourceList);
+        adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         spinSource.setAdapter(adapterSource);
         spinSource.setSelection(0);
 
-        ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, new String[] { getString(R.string.msgValidationDestination) });
-        adapterDestination.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, destinationList);
+        adapterDestination.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         spinDestination.setAdapter(adapterDestination);
         spinDestination.setSelection(0);
 
-        Calendar maxDate;
-        Calendar current = maxDate = Calendar.getInstance();
         datePickerDialog = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
         {
 
@@ -154,18 +186,12 @@ public class FragmentForm extends SherlockFragment
 
     private void clearForm()
     {
-        spinExpenseType.setSelection(0);
-        etDate.setText(dateFormatter.format(new Date().getTime()));
+        spinType.setSelection(0);
         spinSource.setSelection(0);
         spinDestination.setSelection(0);
+        etDate.setText(dateFormatter.format(new Date().getTime()));
         etCount.setText("");
         etCost.setText("");
         etComment.setText("");
-    }
-
-    @OnClick(R.id.etDate)
-    public void onClick(View view)
-    {
-        datePickerDialog.show();
     }
 }

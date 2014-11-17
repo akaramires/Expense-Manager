@@ -29,4 +29,5 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-android:4.23'
     compile 'com.android.support:support-v4:21.+'
     compile 'com.mobsandgeeks:android-saripaar:+'
+    compile 'com.j256.ormlite:ormlite-android:4.23'
 }
