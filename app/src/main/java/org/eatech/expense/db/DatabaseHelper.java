@@ -15,7 +15,9 @@ import com.j256.ormlite.table.TableUtils;
 
 import org.eatech.expense.db.dao.CurrencyDao;
 import org.eatech.expense.db.dao.SourceDao;
+import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.CurrencyEntity;
+import org.eatech.expense.db.entities.DestinationEntity;
 import org.eatech.expense.db.entities.SourceEntity;
 
 import java.sql.SQLException;
@@ -27,7 +29,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
     private static final String TAG = "Expense-" + DatabaseHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME    = "expense.sqlite";
-    private static final int    DATABASE_VERSION = 3;
+    private static final int    DATABASE_VERSION = 4;
     private CurrencyDao currencyDao;
     private SourceDao   sourceDao;
 
@@ -43,22 +45,40 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
         try {
 
             TableUtils.createTable(connectionSource, CurrencyEntity.class);
-
             database.execSQL("INSERT INTO `" + CurrencyEntity.TABLE_NAME + "` " +
-                "(`title`,           `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES " +
-                "('Фунт стерлингов', 'GBP',  '£',           '',              0,         '" + curDate + "')," +
-                "('Доллар США',      'USD',  '$',           '',              0,         '" + curDate + "')," +
-                "('Евро',            'EUR',  '',            '€',             0,         '" + curDate + "');");
+                "(`title`,             `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES " +
+                "('Доллар США',        'USD',  '$',           '',              0,         '" + curDate + "')," +
+                "('Евро',              'EUR',  '',            '€',             0,         '" + curDate + "')," +
+                "('Российский рубль',  'RUB',  '',            'руб.',          0,         '" + curDate + "')," +
+                "('Украинская гривна', 'UAH',  '',            '₴',             0,         '" + curDate + "')," +
+                "('Фунт стерлингов',   'GBP',  '£',           '',              0,         '" + curDate + "')" +
+                ";");
 
             TableUtils.createTable(connectionSource, SourceEntity.class);
-
             database.execSQL("INSERT INTO `" + SourceEntity.TABLE_NAME + "` " +
                 "(`title`,       `sum_start`, `sum_current`, `created_at`,      `currency_id`) VALUES " +
-                "('Master Card', '500',       '500',         '" + curDate + "',  1);");
+                "('Master Card', '500',       '500',         '" + curDate + "',  1)" +
+                ";");
+
+            TableUtils.createTable(connectionSource, CategoryEntity.class);
+            database.execSQL("INSERT INTO `" + CategoryEntity.TABLE_NAME + "` " +
+                "(`title`,       `created_at`) VALUES " +
+                "('Автомобиль',  '" + curDate + "')," +
+                "('Еда',         '" + curDate + "')," +
+                "('Работа',      '" + curDate + "')" +
+                ";");
+
+            TableUtils.createTable(connectionSource, DestinationEntity.class);
+            database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` " +
+                "(`title`,    `category_id`, `type`,  `created_at`) VALUES " +
+                "('Бензин',   1,             'out',   '" + curDate + "')," +
+                "('Масло',    1,             'out',   '" + curDate + "')," +
+                "('Зарплата', 2,             'in',    '" + curDate + "')" +
+                ";");
 
         } catch (SQLException e) {
             Log.e(TAG, "Error creating DB " + DATABASE_NAME);
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 

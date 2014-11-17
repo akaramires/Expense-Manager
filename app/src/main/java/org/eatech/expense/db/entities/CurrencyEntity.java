@@ -9,6 +9,8 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.util.Date;
+
 @DatabaseTable(tableName = "currencies")
 public class CurrencyEntity
 {
@@ -134,9 +136,9 @@ public class CurrencyEntity
         return created_at;
     }
 
-    public void setCreated_at(long created_at)
+    public void setCreated_at()
     {
-        this.created_at = created_at;
+        this.created_at = new Date().getTime();
     }
 
     @Override
