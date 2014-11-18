@@ -110,7 +110,7 @@ public class SourceActivity extends SherlockFragmentActivity
             case R.id.action_delete:
                 try {
                     dbHelper.getSourceDAO().delete(sourceEntity);
-                    
+
                     fillList();
                 } catch (SQLException e) {
                     e.printStackTrace();

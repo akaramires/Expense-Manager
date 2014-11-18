@@ -8,6 +8,7 @@ package org.eatech.expense.fragments;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.mobsandgeeks.saripaar.Rule;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NumberRule;
 import com.mobsandgeeks.saripaar.annotation.Required;
@@ -46,7 +48,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class FragmentForm extends SherlockFragment
+public class FragmentForm extends SherlockFragment implements Validator.ValidationListener
 {
     private static final String TAG = "Expense-" + FragmentForm.class.getSimpleName();
 
@@ -106,7 +108,7 @@ public class FragmentForm extends SherlockFragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         validator = new Validator(this);
-        validator.setValidationListener(new FragmentFormValidator());
+        validator.setValidationListener(this);
 
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         current = maxDate = Calendar.getInstance();
@@ -161,6 +163,11 @@ public class FragmentForm extends SherlockFragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        try {
+            setupSourceAdapter();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupForm() throws SQLException
@@ -194,6 +201,7 @@ public class FragmentForm extends SherlockFragment
 
         ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, sourceList);
         adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+        spinSource.setAdapter(null);
         spinSource.setAdapter(adapterSource);
         spinSource.setSelection(0);
 
@@ -238,5 +246,38 @@ public class FragmentForm extends SherlockFragment
                 etDate.setText(dateFormatter.format(newDate.getTime()));
             }
         }, current, null, maxDate);
+    }
+
+    @Override
+    public void onValidationSucceeded()
+    {
+        Log.i(TAG, "YES!!!");
+    }
+
+    @Override
+    public void onValidationFailed(View failedView, Rule<?> failedRule)
+    {
+        String message = failedRule.getFailureMessage();
+
+        if (failedView instanceof EditText) {
+            failedView.requestFocus();
+            ((EditText) failedView).setError(message);
+        } else if (failedView instanceof Spinner) {
+            ViewGroup parent = (ViewGroup) failedView.getParent();
+
+            switch (failedView.getId()) {
+                case R.id.spinSource:
+                    EditText etSource = (EditText) parent.findViewById(R.id.etSource);
+                    etSource.requestFocus();
+                    etSource.setError(message);
+                    break;
+                case R.id.spinDestination:
+                    EditText etDestination = (EditText) parent.findViewById(R.id.etDestination);
+                    etDestination.requestFocus();
+                    etDestination.setError(message);
+                    break;
+            }
+            Log.e(TAG, message);
+        }
     }
 }
