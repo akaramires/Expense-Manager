@@ -36,15 +36,11 @@ public class SourceFormActivity extends SherlockFragmentActivity
     TextView etTitle;
 
     @InjectView(R.id.spinCurrency)
-    @Select(order = 2, defaultSelection = 0, messageResId = R.string.msgValidationCurrency)
     Spinner spinCurrency;
 
-    @InjectView(R.id.etCurrency)
-    TextView etCurrency;
-
     @InjectView(R.id.etSum)
-    @Required(order = 3)
-    @NumberRule(order = 4, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationSum)
+    @Required(order = 2)
+    @NumberRule(order = 3, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationSum)
     EditText etSum;
 
     private Validator      validator;
@@ -114,7 +110,7 @@ public class SourceFormActivity extends SherlockFragmentActivity
 
         List<CurrencyEntity> currencies = dbHelper.getCurrencyDAO().getAll();
         for (CurrencyEntity currency : currencies) {
-            currencyList.add(currency.getTitle());
+            currencyList.add(currency.getTitle() + " - " + currency.getCode());
         }
 
         ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, currencyList);

@@ -18,7 +18,7 @@ import org.eatech.expense.R;
 
 public class FragmentFormValidator implements Validator.ValidationListener
 {
-    private static final String TAG = "EXPENSE-" + FragmentFormValidator.class.getSimpleName();
+    private static final String TAG = "Expense-" + FragmentFormValidator.class.getSimpleName();
 
     @Override
     public void onValidationSucceeded()
