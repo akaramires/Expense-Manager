@@ -2,7 +2,11 @@ package org.eatech.expense;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -22,10 +26,13 @@ import butterknife.InjectView;
 
 public class SourceActivity extends SherlockFragmentActivity
 {
+    private static final String TAG = "Expense-" + SourceActivity.class.getSimpleName();
+
     @InjectView(android.R.id.list)
     ListView listView;
 
-    private DatabaseHelper dbHelper;
+    private DatabaseHelper              dbHelper;
+    private SourceAdapter<SourceEntity> sourceAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,6 +46,8 @@ public class SourceActivity extends SherlockFragmentActivity
         dbHelper = HelperFactory.getInstance().getHelper();
 
         fillList();
+
+        registerForContextMenu(listView);
     }
 
     @Override
@@ -80,10 +89,42 @@ public class SourceActivity extends SherlockFragmentActivity
         }
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.listview_actions, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item)
+    {
+        AdapterView.AdapterContextMenuInfo source = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        SourceEntity sourceEntity = sourceAdapter.getItem(source.position);
+
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                Log.i(TAG, "edit");
+                return true;
+            case R.id.action_delete:
+                try {
+                    dbHelper.getSourceDAO().delete(sourceEntity);
+                    
+                    fillList();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
     private void fillList()
     {
         try {
-            SourceAdapter<SourceEntity> sourceAdapter = new SourceAdapter<SourceEntity>(this);
+            sourceAdapter = new SourceAdapter<SourceEntity>(this);
             List<SourceEntity> sources = dbHelper.getSourceDAO().getAll();
 
             if (sources.size() > 0) {
