@@ -121,7 +121,6 @@ public class SourceEntity
     public CurrencyEntity getCurrency() throws SQLException
     {
         return HelperFactory.getInstance().getHelper().getCurrencyDAO().queryForId(currency.getId());
-//        return currency;
     }
 
     public void setCurrency(CurrencyEntity currency)

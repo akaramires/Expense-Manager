@@ -1,8 +1,11 @@
 package org.eatech.expense;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
@@ -12,11 +15,15 @@ import org.eatech.expense.db.HelperFactory;
 import org.eatech.expense.db.entities.SourceEntity;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class SourceActivity extends SherlockListActivity
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
+public class SourceActivity extends SherlockFragmentActivity
 {
+    @InjectView(android.R.id.list)
+    ListView listView;
 
     private DatabaseHelper dbHelper;
 
@@ -25,6 +32,8 @@ public class SourceActivity extends SherlockListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source);
+        ButterKnife.inject(this);
+
         getSupportActionBar().setTitle(getString(R.string.screen_sources));
 
         dbHelper = HelperFactory.getInstance().getHelper();
@@ -38,7 +47,7 @@ public class SourceActivity extends SherlockListActivity
                     sourceAdapter.add(source);
                 }
 
-                setListAdapter(sourceAdapter);
+                listView.setAdapter(sourceAdapter);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -57,10 +66,17 @@ public class SourceActivity extends SherlockListActivity
     {
         switch (item.getItemId()) {
             case R.id.action_add:
-
+                Intent intent = new Intent(this, SourceFormActivity.class);
+                startActivityForResult(intent, 1);
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        
     }
 }

@@ -106,7 +106,7 @@ public class FragmentForm extends SherlockFragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         validator = new Validator(this);
-        validator.setValidationListener(new FragmentFormListeners());
+        validator.setValidationListener(new FragmentFormValidator());
 
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         current = maxDate = Calendar.getInstance();

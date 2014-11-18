@@ -20,7 +20,11 @@
         </activity>
         <activity
             android:name=".SourceActivity"
-            android:label="@string/title_activity_source">
+            android:label="@string/screen_sources">
+        </activity>
+        <activity
+            android:name=".SourceFormActivity"
+            android:label="@string/action_add">
         </activity>
     </application>
 
