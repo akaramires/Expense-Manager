@@ -26,6 +26,5 @@ public class MainActivity extends SherlockFragmentActivity
 
         mDemoCollectionPagerAdapter = new PagerAdapter(this, getSupportFragmentManager());
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-//        mViewPager.setCurrentItem(1);
     }
 }

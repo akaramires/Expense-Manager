@@ -25,11 +25,11 @@ public class PagerAdapter extends FragmentStatePagerAdapter
     {
         super(fm);
         titles = new String[] {
-            context.getString(R.string.fragment_form),
-            context.getString(R.string.fragment_list),
-            context.getString(R.string.fragment_orders),
-            context.getString(R.string.fragment_budgets),
-            context.getString(R.string.fragment_reports)
+            context.getString(R.string.action_add),
+            context.getString(R.string.screen_operations),
+            context.getString(R.string.screen_orders),
+            context.getString(R.string.screen_budgets),
+            context.getString(R.string.screen_reports)
         };
     }
 

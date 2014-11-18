@@ -9,6 +9,9 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.eatech.expense.db.HelperFactory;
+
+import java.sql.SQLException;
 import java.util.Date;
 
 @DatabaseTable(tableName = "sources")
@@ -115,9 +118,10 @@ public class SourceEntity
         this.created_at = new Date().getTime();
     }
 
-    public CurrencyEntity getCurrency()
+    public CurrencyEntity getCurrency() throws SQLException
     {
-        return currency;
+        return HelperFactory.getInstance().getHelper().getCurrencyDAO().queryForId(currency.getId());
+//        return currency;
     }
 
     public void setCurrency(CurrencyEntity currency)

@@ -4,18 +4,23 @@
     <string name="app_name">Expense Manager</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="fragment_form">Добавить</string>
-    <string name="fragment_list">Операции</string>
-    <string name="fragment_orders">Счета</string>
-    <string name="fragment_budgets">Бюджеты</string>
-    <string name="fragment_reports">Отчеты</string>
-    <string name="lblType">Тип</string>
 
+    <string name="screen_operation">Операция</string>
+    <string name="screen_operations">Операции</string>
+    <string name="screen_order">Счет</string>
+    <string name="screen_orders">Счета</string>
+    <string name="screen_budget">Бюджет</string>
+    <string name="screen_budgets">Бюджеты</string>
+    <string name="screen_report">Отчет</string>
+    <string name="screen_reports">Отчеты</string>
+    <string name="screen_source">Источник</string>
+    <string name="screen_sources">Источники</string>
+
+    <string name="lblType">Тип</string>
     <string-array name="lblTypes">
         <item>Расход</item>
         <item>Доход</item>
     </string-array>
-
     <string name="lblDate">Дата</string>
     <string name="lblSource">Источник</string>
     <string name="lblCount">Количество</string>
