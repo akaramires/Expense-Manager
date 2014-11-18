@@ -38,20 +38,7 @@ public class SourceActivity extends SherlockFragmentActivity
 
         dbHelper = HelperFactory.getInstance().getHelper();
 
-        try {
-            SourceAdapter<SourceEntity> sourceAdapter = new SourceAdapter<SourceEntity>(this);
-            List<SourceEntity> sources = dbHelper.getSourceDAO().getAll();
-
-            if (sources.size() > 0) {
-                for (SourceEntity source : sources) {
-                    sourceAdapter.add(source);
-                }
-
-                listView.setAdapter(sourceAdapter);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        fillList();
     }
 
     @Override
@@ -77,6 +64,38 @@ public class SourceActivity extends SherlockFragmentActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        
+        if (data == null) {
+            return;
+        }
+
+        int status = data.getIntExtra("status", -1);
+        switch (status) {
+            case -1:
+                break;
+            case 0:
+                break;
+            case 1:
+                fillList();
+                break;
+        }
+    }
+
+    private void fillList()
+    {
+        try {
+            SourceAdapter<SourceEntity> sourceAdapter = new SourceAdapter<SourceEntity>(this);
+            List<SourceEntity> sources = dbHelper.getSourceDAO().getAll();
+
+            if (sources.size() > 0) {
+                for (SourceEntity source : sources) {
+                    sourceAdapter.add(source);
+                }
+
+                listView.setAdapter(null);
+                listView.setAdapter(sourceAdapter);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

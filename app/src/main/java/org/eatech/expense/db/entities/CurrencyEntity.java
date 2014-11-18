@@ -144,14 +144,6 @@ public class CurrencyEntity
     @Override
     public String toString()
     {
-        return "CurrencyEntity{" +
-            "Id=" + Id +
-            ", title='" + title + '\'' +
-            ", code='" + code + '\'' +
-            ", symbol_left='" + symbol_left + '\'' +
-            ", symbol_right='" + symbol_right + '\'' +
-            ", editable=" + editable +
-            ", created_at=" + created_at +
-            '}';
+        return getTitle();
     }
 }

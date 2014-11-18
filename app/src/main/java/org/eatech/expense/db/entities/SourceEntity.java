@@ -47,25 +47,24 @@ public class SourceEntity
     {
     }
 
-    public SourceEntity(String title, String sum_start, String sum_current, long created_at,
-                        CurrencyEntity currency)
+    public SourceEntity(String title, String sum_start, String sum_current, CurrencyEntity currency)
     {
         this.title = title;
         this.sum_start = sum_start;
         this.sum_current = sum_current;
-        this.created_at = created_at;
         this.currency = currency;
+        this.setCreated_at();
     }
 
-    public SourceEntity(int id, String title, String sum_start, String sum_current, long created_at,
+    public SourceEntity(int id, String title, String sum_start, String sum_current,
                         CurrencyEntity currency)
     {
         Id = id;
         this.title = title;
         this.sum_start = sum_start;
         this.sum_current = sum_current;
-        this.created_at = created_at;
         this.currency = currency;
+        this.setCreated_at();
     }
 
     public int getId()
