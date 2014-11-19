@@ -6,16 +6,20 @@
 package org.eatech.expense.fragments;
 
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -39,6 +43,7 @@ import org.eatech.expense.db.entities.SourceEntity;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +53,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class FragmentForm extends SherlockFragment implements Validator.ValidationListener
+public class FragmentForm extends SherlockFragment implements Validator.ValidationListener,
+                                                              View.OnTouchListener
 {
     private static final String TAG = "Expense-" + FragmentForm.class.getSimpleName();
 
@@ -92,6 +98,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private DatePickerDialog datePickerDialog;
     private Validator        validator;
     private DatabaseHelper   dbHelper;
+    private ArrayList<String> destinationList = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -219,7 +226,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
     private void setupDestinationAdapter() throws SQLException
     {
-        ArrayList<String> destinationList = new ArrayList<String>();
+        destinationList = new ArrayList<String>();
         destinationList.add(getString(R.string.msgValidationDestination));
 
         List<CategoryEntity> categories = dbHelper.getCategoryDAO().getAll();
@@ -228,9 +235,9 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         }
 
         ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, destinationList);
-        adapterDestination.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         spinDestination.setAdapter(adapterDestination);
         spinDestination.setSelection(0);
+        spinDestination.setOnTouchListener(this);
     }
 
     private void setupDate()
@@ -279,5 +286,32 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
             }
             Log.e(TAG, message);
         }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent)
+    {
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            final Dialog dialog = new Dialog(getSherlockActivity());
+            dialog.setContentView(android.R.layout.list_content);
+            dialog.setTitle(getString(R.string.lblDestination));
+
+            ListView listView = (ListView) dialog.findViewById(android.R.id.list);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, new ArrayList<String>(destinationList.subList(1, destinationList.size())));
+            listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            {
+
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int pos, long id)
+                {
+                    dialog.dismiss();
+                    spinDestination.setSelection(pos + 1);
+                }
+            });
+            dialog.show();
+            return true;
+        }
+        return false;
     }
 }
