@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -115,9 +116,15 @@ public class SourceActivity extends SherlockFragmentActivity
                 return true;
             case R.id.action_delete:
                 try {
-                    dbHelper.getSourceDAO().delete(sourceEntity);
+                    if (dbHelper.getSourceDAO().countOf() < 2) {
+                        Toast.makeText(this, getString(R.string.msgValidationRemoveLastSource), Toast.LENGTH_SHORT).show();
+                    } else {
+                        dbHelper.getSourceDAO().delete(sourceEntity);
 
-                    fillList();
+                        fillList();
+
+                        Toast.makeText(this, getString(R.string.msgSuccessRemoveSource), Toast.LENGTH_SHORT).show();
+                    }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

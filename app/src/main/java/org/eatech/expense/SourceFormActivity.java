@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -44,7 +45,7 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
     Spinner spinCurrency;
 
     @InjectView(R.id.etSum)
-    @Required(order = 2)
+    @Required(order = 2, messageResId = R.string.msgValidationSum)
     @NumberRule(order = 3, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationSum)
     EditText etSum;
 
@@ -153,13 +154,11 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
 
         try {
             if (edit_id > 0) {
-                SourceEntity sourceEntity = new SourceEntity(edit_id, title, sum, sum, currencyEntity);
-                int updated = dbHelper.getSourceDAO().update(sourceEntity);
-                Log.i(TAG, "updated=" + updated);
+                dbHelper.getSourceDAO().update(new SourceEntity(edit_id, title, sum, sum, currencyEntity));
+                Toast.makeText(this, getString(R.string.msgSuccessUpdateSource), Toast.LENGTH_SHORT).show();
             } else {
-                SourceEntity sourceEntity = new SourceEntity(title, sum, sum, currencyEntity);
-                int added = dbHelper.getSourceDAO().create(sourceEntity);
-                Log.i(TAG, "created=" + added);
+                dbHelper.getSourceDAO().create(new SourceEntity(title, sum, sum, currencyEntity));
+                Toast.makeText(this, getString(R.string.msgSuccessAddSource), Toast.LENGTH_SHORT).show();
             }
 
             closeForm(1);

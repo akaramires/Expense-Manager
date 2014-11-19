@@ -47,5 +47,10 @@
     <string name="msgValidationCurrency">Пожалуйста выберите валюту</string>
     <string name="msgValidationTitle">Пожалуйста введите название</string>
     <string name="msgValidationSum">Пожалуйста введите начальную сумму</string>
+    <string name="msgValidationRemoveLastSource">Вы не можете удалить последний источник</string>
+
+    <string name="msgSuccessRemoveSource">Источник успешно удален</string>
+    <string name="msgSuccessAddSource">Источник успешно добавлен</string>
+    <string name="msgSuccessUpdateSource">Источник успешно обновлен</string>
 
 </resources>
