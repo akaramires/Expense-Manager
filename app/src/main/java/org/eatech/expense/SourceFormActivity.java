@@ -51,6 +51,7 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
     private Validator                    validator;
     private DatabaseHelper               dbHelper;
     private ArrayAdapter<CurrencyEntity> adapterCurrency;
+    private int                          edit_id;
 
     public void onCreate(Bundle savedInstanceState)
     {
@@ -60,6 +61,10 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
         ButterKnife.inject(this);
 
         dbHelper = HelperFactory.getInstance().getHelper();
+
+        Intent intent = getIntent();
+
+        edit_id = intent.getIntExtra("isEdit", -1);
 
         try {
             setupForm();
@@ -95,7 +100,14 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
 
     private void setupForm() throws SQLException
     {
-        setupCurrencyAdapter();
+        int id = -1;
+        if (edit_id > 0) {
+            SourceEntity sourceEntity = dbHelper.getSourceDAO().queryForId(edit_id);
+            etTitle.setText(sourceEntity.getTitle());
+            etSum.setText(sourceEntity.getSum_current());
+            id = sourceEntity.getCurrency().getId();
+        }
+        setupCurrencyAdapter(id);
     }
 
     private void clearForm()
@@ -105,19 +117,26 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
         spinCurrency.setSelection(0);
     }
 
-    private void setupCurrencyAdapter() throws SQLException
+    private void setupCurrencyAdapter(int id) throws SQLException
     {
+        int selected = 0;
+
         ArrayList<CurrencyEntity> currencyList = new ArrayList<CurrencyEntity>();
 
+        int index = 0;
         List<CurrencyEntity> currencies = dbHelper.getCurrencyDAO().getAll();
         for (CurrencyEntity currency : currencies) {
+            if (id > 0 && currency.getId() == id) {
+                selected = index;
+            }
             currencyList.add(currency);
+            index++;
         }
 
         adapterCurrency = new ArrayAdapter<CurrencyEntity>(this, android.R.layout.simple_spinner_item, currencyList);
         adapterCurrency.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         spinCurrency.setAdapter(adapterCurrency);
-        spinCurrency.setSelection(0);
+        spinCurrency.setSelection(selected);
 
     }
 
@@ -132,10 +151,16 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
         CurrencyEntity currencyEntity = new CurrencyEntity();
         currencyEntity.setId(currencyId);
 
-        SourceEntity sourceEntity = new SourceEntity(title, sum, sum, currencyEntity);
         try {
-            int added = dbHelper.getSourceDAO().create(sourceEntity);
-            Log.i(TAG, "created id=" + added);
+            if (edit_id > 0) {
+                SourceEntity sourceEntity = new SourceEntity(edit_id, title, sum, sum, currencyEntity);
+                int updated = dbHelper.getSourceDAO().update(sourceEntity);
+                Log.i(TAG, "updated=" + updated);
+            } else {
+                SourceEntity sourceEntity = new SourceEntity(title, sum, sum, currencyEntity);
+                int added = dbHelper.getSourceDAO().create(sourceEntity);
+                Log.i(TAG, "created=" + added);
+            }
 
             closeForm(1);
         } catch (SQLException e) {
@@ -170,7 +195,7 @@ public class SourceFormActivity extends SherlockFragmentActivity implements
         clearForm();
 
         Intent intent = new Intent();
-        intent.putExtra("status", 1);
+        intent.putExtra("status", status);
         setResult(RESULT_OK, intent);
         finish();
     }

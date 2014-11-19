@@ -63,6 +63,7 @@ public class SourceActivity extends SherlockFragmentActivity
         switch (item.getItemId()) {
             case R.id.action_add:
                 Intent intent = new Intent(this, SourceFormActivity.class);
+                intent.putExtra("isEdit", 0);
                 startActivityForResult(intent, 1);
                 break;
         }
@@ -106,6 +107,11 @@ public class SourceActivity extends SherlockFragmentActivity
         switch (item.getItemId()) {
             case R.id.action_edit:
                 Log.i(TAG, "edit");
+
+                Intent intent = new Intent(this, SourceFormActivity.class);
+                intent.putExtra("isEdit", sourceEntity.getId());
+                startActivityForResult(intent, 1);
+
                 return true;
             case R.id.action_delete:
                 try {
