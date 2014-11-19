@@ -18,8 +18,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -46,8 +48,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -293,22 +297,112 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     {
         if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
             final Dialog dialog = new Dialog(getSherlockActivity());
-            dialog.setContentView(android.R.layout.list_content);
+            dialog.setContentView(android.R.layout.expandable_list_content);
             dialog.setTitle(getString(R.string.lblDestination));
 
             ListView listView = (ListView) dialog.findViewById(android.R.id.list);
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, new ArrayList<String>(destinationList.subList(1, destinationList.size())));
-            listView.setAdapter(adapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            {
 
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int pos, long id)
-                {
-                    dialog.dismiss();
-                    spinDestination.setSelection(pos + 1);
-                }
-            });
+            String[] groups = new String[] { "Зима", "Весна", "Лето", "Осень" };
+
+            String[] winterMonths = new String[] { "Декабрь", "Январь", "Февраль" };
+            String[] springMonths = new String[] { "Март", "Апрель", "Май" };
+            String[] summerMonths = new String[] { "Июнь", "Июль", "Август" };
+            String[] autumnMonths = new String[] { "Сентябрь", "Октябрь", "Ноябрь" };
+
+            // коллекция для групп
+            ArrayList<Map<String, String>> groupData;
+
+            // коллекция для элементов одной группы
+            ArrayList<Map<String, String>> childDataItem;
+
+            // общая коллекция для коллекций элементов
+            ArrayList<ArrayList<Map<String, String>>> childData;
+            // в итоге получится childData = ArrayList<childDataItem>
+
+            // список атрибутов группы или элемента
+            Map<String, String> m;
+
+            groupData = new ArrayList<Map<String, String>>();
+            for (String group : groups) {
+                // заполняем список атрибутов для каждой группы
+                m = new HashMap<String, String>();
+                m.put("groupName", group); // время года
+                groupData.add(m);
+            }
+
+            // список атрибутов групп для чтения
+            String groupFrom[] = new String[] { "groupName" };
+            // список ID view-элементов, в которые будет помещены аттрибуты групп
+            int groupTo[] = new int[] { android.R.id.text1 };
+
+            // создаем коллекцию для коллекций элементов
+            childData = new ArrayList<ArrayList<Map<String, String>>>();
+
+            // создаем коллекцию элементов для первой группы
+            childDataItem = new ArrayList<Map<String, String>>();
+            // заполняем список аттрибутов для каждого элемента
+            for (String month : winterMonths) {
+                m = new HashMap<String, String>();
+                m.put("monthName", month); // название месяца
+                childDataItem.add(m);
+            }
+            // добавляем в коллекцию коллекций
+            childData.add(childDataItem);
+
+            // создаем коллекцию элементов для второй группы
+            childDataItem = new ArrayList<Map<String, String>>();
+            for (String month : springMonths) {
+                m = new HashMap<String, String>();
+                m.put("monthName", month);
+                childDataItem.add(m);
+            }
+            childData.add(childDataItem);
+
+            // создаем коллекцию элементов для третьей группы
+            childDataItem = new ArrayList<Map<String, String>>();
+            for (String month : summerMonths) {
+                m = new HashMap<String, String>();
+                m.put("monthName", month);
+                childDataItem.add(m);
+            }
+            childData.add(childDataItem);
+
+            // создаем коллекцию элементов для четвертой группы
+            childDataItem = new ArrayList<Map<String, String>>();
+            for (String month : autumnMonths) {
+                m = new HashMap<String, String>();
+                m.put("monthName", month);
+                childDataItem.add(m);
+            }
+            childData.add(childDataItem);
+
+            // список аттрибутов элементов для чтения
+            String childFrom[] = new String[] { "monthName" };
+            // список ID view-элементов, в которые будет помещены аттрибуты
+            // элементов
+            int childTo[] = new int[] { android.R.id.text1 };
+
+            SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
+                getSherlockActivity(), groupData,
+                android.R.layout.simple_expandable_list_item_1, groupFrom,
+                groupTo, childData, android.R.layout.simple_list_item_1,
+                childFrom, childTo);
+
+            ExpandableListView expListView = (ExpandableListView) dialog.findViewById(android.R.id.list);
+            expListView.setAdapter(adapter);
+
+            //            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, new ArrayList<String>(destinationList.subList(1, destinationList.size())));
+            //            listView.setAdapter(adapter);
+            //            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            //            {
+            //
+            //                @Override
+            //                public void onItemClick(AdapterView<?> parent, View view, int pos, long id)
+            //                {
+            //                    dialog.dismiss();
+            //                    spinDestination.setSelection(pos + 1);
+            //                }
+            //            });
             dialog.show();
             return true;
         }
