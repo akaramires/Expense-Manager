@@ -18,6 +18,7 @@ public class DestinationEntity
 
     public final static String COL_TITLE      = "title";
     public final static String COL_TYPE       = "type";
+    public final static String COL_EDITABLE   = "editable";
     public final static String COL_CREATED_AT = "created_at";
 
     @DatabaseField(generatedId = true)
@@ -32,6 +33,9 @@ public class DestinationEntity
     @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = COL_TYPE)
     private String type;
 
+    @DatabaseField(canBeNull = false, dataType = DataType.INTEGER, columnName = COL_EDITABLE, defaultValue = "1")
+    private int editable;
+
     @DatabaseField(canBeNull = false, dataType = DataType.LONG, columnName = COL_CREATED_AT)
     private long created_at;
 
@@ -45,6 +49,7 @@ public class DestinationEntity
         this.title = title;
         this.type = type;
         this.created_at = created_at;
+        this.editable = 1;
     }
 
     public DestinationEntity(int id, CategoryEntity category, String title, String type,
@@ -55,6 +60,7 @@ public class DestinationEntity
         this.title = title;
         this.type = type;
         this.created_at = created_at;
+        this.editable = 1;
     }
 
     public int getId()
@@ -111,6 +117,16 @@ public class DestinationEntity
         this.created_at = new Date().getTime();
     }
 
+    public int getEditable()
+    {
+        return editable;
+    }
+
+    public void setEditable()
+    {
+        this.editable = 1;
+    }
+
     @Override
     public String toString()
     {
@@ -119,6 +135,7 @@ public class DestinationEntity
             ", category=" + category +
             ", title='" + title + '\'' +
             ", type=" + type +
+            ", editable=" + editable +
             ", created_at=" + created_at +
             '}';
     }

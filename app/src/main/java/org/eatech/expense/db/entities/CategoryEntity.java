@@ -19,6 +19,7 @@ public class CategoryEntity
     public final static String TABLE_NAME = "categories";
 
     public final static String COL_TITLE      = "title";
+    public final static String COL_EDITABLE   = "editable";
     public final static String COL_CREATED_AT = "created_at";
 
     @DatabaseField(generatedId = true)
@@ -26,6 +27,9 @@ public class CategoryEntity
 
     @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = COL_TITLE)
     private String title;
+
+    @DatabaseField(canBeNull = false, dataType = DataType.INTEGER, columnName = COL_EDITABLE, defaultValue = "1")
+    private int editable;
 
     @DatabaseField(canBeNull = false, dataType = DataType.LONG, columnName = COL_CREATED_AT)
     private long created_at;
@@ -41,6 +45,7 @@ public class CategoryEntity
                           ForeignCollection<DestinationEntity> destinations)
     {
         this.title = title;
+        this.editable = 1;
         this.created_at = created_at;
         this.destinations = destinations;
     }
@@ -50,6 +55,7 @@ public class CategoryEntity
     {
         Id = id;
         this.title = title;
+        this.editable = 1;
         this.created_at = created_at;
         this.destinations = destinations;
     }
@@ -72,6 +78,16 @@ public class CategoryEntity
     public void setTitle(String title)
     {
         this.title = title;
+    }
+
+    public int getEditable()
+    {
+        return editable;
+    }
+
+    public void setEditable()
+    {
+        this.editable = 1;
     }
 
     public long getCreated_at()
@@ -100,6 +116,7 @@ public class CategoryEntity
         return "CategoryEntity{" +
             "Id=" + Id +
             ", title='" + title + '\'' +
+            ", editable=" + editable +
             ", created_at=" + created_at +
             ", destinations=" + destinations +
             '}';

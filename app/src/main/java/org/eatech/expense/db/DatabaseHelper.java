@@ -31,7 +31,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
     private static final String TAG = "Expense-" + DatabaseHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME    = "expense.sqlite";
-    private static final int    DATABASE_VERSION = 4;
+    private static final int    DATABASE_VERSION = 5;
     private CurrencyDao    currencyDao;
     private SourceDao      sourceDao;
     private CategoryDao    categoryDao;
@@ -66,18 +66,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
 
             TableUtils.createTable(connectionSource, CategoryEntity.class);
             database.execSQL("INSERT INTO `" + CategoryEntity.TABLE_NAME + "` " +
-                "(`title`,       `created_at`) VALUES " +
-                "('Автомобиль',  '" + curDate + "')," +
-                "('Еда',         '" + curDate + "')," +
-                "('Работа',      '" + curDate + "')" +
+                "(`title`,       `editable`, `created_at`) VALUES " +
+                "('Автомобиль',   0,         '" + curDate + "')," +
+                "('Еда',          0,         '" + curDate + "')," +
+                "('Работа',       0,         '" + curDate + "')" +
                 ";");
 
             TableUtils.createTable(connectionSource, DestinationEntity.class);
             database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` " +
-                "(`title`,    `category_id`, `type`,  `created_at`) VALUES " +
-                "('Бензин',   1,             'out',   '" + curDate + "')," +
-                "('Масло',    1,             'out',   '" + curDate + "')," +
-                "('Зарплата', 2,             'in',    '" + curDate + "')" +
+                "(`title`,    `category_id`, `type`, `editable`, `created_at`) VALUES " +
+                "('Бензин',   1,             'out',   0,         '" + curDate + "')," +
+                "('Масло',    1,             'out',   0,         '" + curDate + "')," +
+                "('Зарплата', 2,             'in',    0,         '" + curDate + "')" +
                 ";");
 
         } catch (SQLException e) {

@@ -67,6 +67,9 @@ public class SourceActivity extends SherlockFragmentActivity
                 intent.putExtra("isEdit", 0);
                 startActivityForResult(intent, 1);
                 break;
+            case R.id.action_cancel:
+                finish();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
