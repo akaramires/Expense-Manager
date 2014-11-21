@@ -14,13 +14,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 
@@ -28,6 +26,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.mobsandgeeks.saripaar.Rule;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NumberRule;
@@ -40,12 +39,12 @@ import org.eatech.expense.adapter.RangeDatePickerDialog;
 import org.eatech.expense.db.DatabaseHelper;
 import org.eatech.expense.db.HelperFactory;
 import org.eatech.expense.db.entities.CategoryEntity;
+import org.eatech.expense.db.entities.DestinationEntity;
 import org.eatech.expense.db.entities.SourceEntity;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,7 +57,8 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class FragmentForm extends SherlockFragment implements Validator.ValidationListener,
-                                                              View.OnTouchListener
+                                                              View.OnTouchListener,
+                                                              ExpandableListView.OnChildClickListener
 {
     private static final String TAG = "Expense-" + FragmentForm.class.getSimpleName();
 
@@ -99,9 +99,11 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private Calendar         maxDate;
     private Calendar         current;
 
-    private DatePickerDialog datePickerDialog;
-    private Validator        validator;
-    private DatabaseHelper   dbHelper;
+    private DatePickerDialog            datePickerDialog;
+    private Validator                   validator;
+    private DatabaseHelper              dbHelper;
+    private List<CategoryEntity>        catsEntList;
+    private SimpleExpandableListAdapter expAdpt;
     private ArrayList<String> destinationList = null;
 
     @Override
@@ -296,116 +298,73 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     public boolean onTouch(View view, MotionEvent motionEvent)
     {
         if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            final Dialog dialog = new Dialog(getSherlockActivity());
-            dialog.setContentView(android.R.layout.expandable_list_content);
-            dialog.setTitle(getString(R.string.lblDestination));
+            try {
+                Dialog dialog = new Dialog(getSherlockActivity());
+                dialog.setContentView(android.R.layout.expandable_list_content);
+                dialog.setTitle(getString(R.string.lblDestination));
 
-            ListView listView = (ListView) dialog.findViewById(android.R.id.list);
+                ExpandableListView expListView = (ExpandableListView) dialog.findViewById(android.R.id.list);
 
-            String[] groups = new String[] { "Зима", "Весна", "Лето", "Осень" };
+                catsEntList = dbHelper.getCategoryDAO().getAll();
+                ArrayList<Map<String, String>> catsData = new ArrayList<Map<String, String>>();
+                ArrayList<ArrayList<Map<String, String>>> destData = new ArrayList<ArrayList<Map<String, String>>>();
+                Map<String, String> tmp;
 
-            String[] winterMonths = new String[] { "Декабрь", "Январь", "Февраль" };
-            String[] springMonths = new String[] { "Март", "Апрель", "Май" };
-            String[] summerMonths = new String[] { "Июнь", "Июль", "Август" };
-            String[] autumnMonths = new String[] { "Сентябрь", "Октябрь", "Ноябрь" };
+                for (CategoryEntity cat : catsEntList) {
+                    tmp = new HashMap<String, String>();
+                    tmp.put("id", String.valueOf(cat.getId()));
+                    tmp.put("title", cat.getTitle());
+                    catsData.add(tmp);
 
-            // коллекция для групп
-            ArrayList<Map<String, String>> groupData;
+                    ArrayList<Map<String, String>> destDataItem = new ArrayList<Map<String, String>>();
+                    for (DestinationEntity dest : cat.getDestinations()) {
+                        tmp = new HashMap<String, String>();
+                        tmp.put("id", String.valueOf(dest.getId()));
+                        tmp.put("title", dest.getTitle());
+                        destDataItem.add(tmp);
+                    }
+                    destData.add(destDataItem);
+                }
 
-            // коллекция для элементов одной группы
-            ArrayList<Map<String, String>> childDataItem;
+                expAdpt = new SimpleExpandableListAdapter(
+                    getSherlockActivity(),
+                    catsData,
+                    android.R.layout.simple_expandable_list_item_1,
+                    new String[] { "title" },
+                    new int[] { android.R.id.text1 },
+                    destData,
+                    android.R.layout.simple_list_item_1,
+                    new String[] { "title" },
+                    new int[] { android.R.id.text1 });
 
-            // общая коллекция для коллекций элементов
-            ArrayList<ArrayList<Map<String, String>>> childData;
-            // в итоге получится childData = ArrayList<childDataItem>
-
-            // список атрибутов группы или элемента
-            Map<String, String> m;
-
-            groupData = new ArrayList<Map<String, String>>();
-            for (String group : groups) {
-                // заполняем список атрибутов для каждой группы
-                m = new HashMap<String, String>();
-                m.put("groupName", group); // время года
-                groupData.add(m);
+                expListView.setAdapter(expAdpt);
+                expListView.setOnChildClickListener(this);
+                dialog.show();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-
-            // список атрибутов групп для чтения
-            String groupFrom[] = new String[] { "groupName" };
-            // список ID view-элементов, в которые будет помещены аттрибуты групп
-            int groupTo[] = new int[] { android.R.id.text1 };
-
-            // создаем коллекцию для коллекций элементов
-            childData = new ArrayList<ArrayList<Map<String, String>>>();
-
-            // создаем коллекцию элементов для первой группы
-            childDataItem = new ArrayList<Map<String, String>>();
-            // заполняем список аттрибутов для каждого элемента
-            for (String month : winterMonths) {
-                m = new HashMap<String, String>();
-                m.put("monthName", month); // название месяца
-                childDataItem.add(m);
-            }
-            // добавляем в коллекцию коллекций
-            childData.add(childDataItem);
-
-            // создаем коллекцию элементов для второй группы
-            childDataItem = new ArrayList<Map<String, String>>();
-            for (String month : springMonths) {
-                m = new HashMap<String, String>();
-                m.put("monthName", month);
-                childDataItem.add(m);
-            }
-            childData.add(childDataItem);
-
-            // создаем коллекцию элементов для третьей группы
-            childDataItem = new ArrayList<Map<String, String>>();
-            for (String month : summerMonths) {
-                m = new HashMap<String, String>();
-                m.put("monthName", month);
-                childDataItem.add(m);
-            }
-            childData.add(childDataItem);
-
-            // создаем коллекцию элементов для четвертой группы
-            childDataItem = new ArrayList<Map<String, String>>();
-            for (String month : autumnMonths) {
-                m = new HashMap<String, String>();
-                m.put("monthName", month);
-                childDataItem.add(m);
-            }
-            childData.add(childDataItem);
-
-            // список аттрибутов элементов для чтения
-            String childFrom[] = new String[] { "monthName" };
-            // список ID view-элементов, в которые будет помещены аттрибуты
-            // элементов
-            int childTo[] = new int[] { android.R.id.text1 };
-
-            SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
-                getSherlockActivity(), groupData,
-                android.R.layout.simple_expandable_list_item_1, groupFrom,
-                groupTo, childData, android.R.layout.simple_list_item_1,
-                childFrom, childTo);
-
-            ExpandableListView expListView = (ExpandableListView) dialog.findViewById(android.R.id.list);
-            expListView.setAdapter(adapter);
-
-            //            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_list_item_1, android.R.id.text1, new ArrayList<String>(destinationList.subList(1, destinationList.size())));
-            //            listView.setAdapter(adapter);
-            //            listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            //            {
-            //
-            //                @Override
-            //                public void onItemClick(AdapterView<?> parent, View view, int pos, long id)
-            //                {
-            //                    dialog.dismiss();
-            //                    spinDestination.setSelection(pos + 1);
-            //                }
-            //            });
-            dialog.show();
             return true;
         }
+        return false;
+    }
+
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View view, int groupPosition,
+                                int childPosition, long id)
+    {
+        CategoryEntity cat = (CategoryEntity) expAdpt.getGroup(groupPosition);
+        Log.i(TAG, cat.toString());
+        //        int index = 0;
+        //        ForeignCollection<DestinationEntity> destionations = catsEntList.get(groupPosition).getDestinations();
+        //        for (DestinationEntity dest : destionations) {
+        //            if (index == childPosition) {
+        //                Log.i(TAG, dest.toString());
+        //                break;
+        //            }
+        //        }
+        Log.i(TAG, "groupPosition=" + groupPosition);
+        Log.i(TAG, "childPosition=" + childPosition);
+        Log.i(TAG, "id=" + id);
         return false;
     }
 }

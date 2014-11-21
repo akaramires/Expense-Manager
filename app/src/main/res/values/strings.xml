@@ -32,6 +32,7 @@
     <string name="lblTotal">Итого</string>
     <string name="lblTitle">Название</string>
     <string name="lblCurrency">Валюта</string>
+    <string name="lblCategory">Категория</string>
 
     <string name="action_add">Добавить</string>
     <string name="action_save">Cохранить</string>
