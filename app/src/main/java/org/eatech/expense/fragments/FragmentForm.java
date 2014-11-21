@@ -9,6 +9,8 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,16 +23,15 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.j256.ormlite.dao.ForeignCollection;
 import com.mobsandgeeks.saripaar.Rule;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NumberRule;
-import com.mobsandgeeks.saripaar.annotation.Required;
 import com.mobsandgeeks.saripaar.annotation.Select;
 
 import org.eatech.expense.R;
@@ -46,6 +47,7 @@ import org.eatech.expense.db.entities.SourceEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,14 +83,15 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     Spinner spinDestination;
 
     @InjectView(R.id.etCount)
-    @Required(order = 3)
-    @NumberRule(order = 4, type = NumberRule.NumberType.INTEGER, gt = 1, messageResId = R.string.msgValidationCount)
+    @NumberRule(order = 3, type = NumberRule.NumberType.INTEGER, gt = 0.99, messageResId = R.string.msgValidationCount)
     EditText etCount;
 
     @InjectView(R.id.etCost)
-    @Required(order = 5)
-    @NumberRule(order = 6, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
+    @NumberRule(order = 4, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
     EditText etCost;
+
+    @InjectView(R.id.outTotal)
+    TextView outTotal;
 
     @InjectView(R.id.etComment)
     EditText etComment;
@@ -109,7 +112,6 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private SimpleExpandableListAdapter expAdpt;
     private Dialog                      dlgDestionation;
     private List<DestinationEntity>     destinationEntityList;
-    private List<SourceEntity>          sourceEntityList;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -194,6 +196,34 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         setupSourceAdapter();
         setupDestinationAdapter();
         setupDate();
+
+        outTotal.setText("0");
+        etCount.setText("1");
+        etCount.addTextChangedListener(new AmountTotal());
+        etCost.addTextChangedListener(new AmountTotal());
+    }
+
+    private class AmountTotal implements TextWatcher
+    {
+        public void afterTextChanged(Editable s)
+        {
+            double cost = 0;
+            if (etCost.getText().toString().length() > 0) {
+                cost = Double.parseDouble(etCost.getText().toString());
+            }
+
+            int count = 0;
+            if (etCount.getText().toString().length() > 0) {
+                count = Integer.parseInt(etCount.getText().toString());
+            }
+
+            double total = new BigDecimal(count * cost).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            outTotal.setText(String.valueOf(total));
+        }
+
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
 
     private void clearForm()
@@ -213,7 +243,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         adptSrcDropdown.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         adptSrcDropdown.add(new SourceEntity(0, getString(R.string.msgValidationSource), "0", "0", null));
 
-        sourceEntityList = dbHelper.getSourceDAO().getAll();
+        List<SourceEntity> sourceEntityList = dbHelper.getSourceDAO().getAll();
         for (SourceEntity srcEntity : sourceEntityList) {
             adptSrcDropdown.add(srcEntity);
         }
