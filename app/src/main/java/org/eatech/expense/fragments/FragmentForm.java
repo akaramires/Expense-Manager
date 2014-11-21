@@ -237,6 +237,11 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         DestinationAdapter<DestinationEntity> adptDstnDropDown = new DestinationAdapter<DestinationEntity>(getSherlockActivity());
         destinationEntityList = dbHelper.getDestinationDAO().getAll();
 
+        DestinationEntity emptyEnt = new DestinationEntity();
+        emptyEnt.setId(0);
+        emptyEnt.setTitle(getString(R.string.msgValidationDestination));
+        adptDstnDropDown.add(emptyEnt);
+
         for (DestinationEntity destinationEntity : destinationEntityList) {
             adptDstnDropDown.add(destinationEntity);
         }
@@ -359,7 +364,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
             JSONObject cat = new JSONObject(expAdpt.getChild(groupPosition, childPosition).toString());
             int destination_id = cat.getInt("id");
 
-            int index = 0;
+            int index = 1;
             for (DestinationEntity destinationEntity : destinationEntityList) {
                 if (destination_id == destinationEntity.getId()) {
                     spinDestination.setSelection(index);
