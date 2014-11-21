@@ -41,6 +41,8 @@ import org.eatech.expense.db.HelperFactory;
 import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.DestinationEntity;
 import org.eatech.expense.db.entities.SourceEntity;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -352,19 +354,14 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     public boolean onChildClick(ExpandableListView parent, View view, int groupPosition,
                                 int childPosition, long id)
     {
-        CategoryEntity cat = (CategoryEntity) expAdpt.getGroup(groupPosition);
-        Log.i(TAG, cat.toString());
-        //        int index = 0;
-        //        ForeignCollection<DestinationEntity> destionations = catsEntList.get(groupPosition).getDestinations();
-        //        for (DestinationEntity dest : destionations) {
-        //            if (index == childPosition) {
-        //                Log.i(TAG, dest.toString());
-        //                break;
-        //            }
-        //        }
-        Log.i(TAG, "groupPosition=" + groupPosition);
-        Log.i(TAG, "childPosition=" + childPosition);
-        Log.i(TAG, "id=" + id);
+        JSONObject cat = null;
+        try {
+            cat = new JSONObject(expAdpt.getChild(groupPosition, childPosition).toString());
+            Log.i(TAG, "" + cat.getInt("id"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         return false;
     }
 }
