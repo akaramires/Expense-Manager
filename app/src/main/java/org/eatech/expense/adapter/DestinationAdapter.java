@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.DestinationEntity;
 
@@ -21,13 +23,15 @@ import butterknife.InjectView;
 public class DestinationAdapter<S> extends ArrayAdapter<DestinationEntity>
 {
     private static final String TAG = "Expense-" + DestinationAdapter.class.getSimpleName();
+    private final int layout;
 
     private Context context;
 
-    public DestinationAdapter(Context c)
+    public DestinationAdapter(Context context)
     {
-        super(c, android.R.layout.simple_list_item_1);
-        this.context = c;
+        super(context, android.R.layout.simple_spinner_item);
+        this.context = context;
+        this.layout = android.R.layout.simple_spinner_item;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class DestinationAdapter<S> extends ArrayAdapter<DestinationEntity>
 
         if (row == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            row = inflater.inflate(this.layout, parent, false);
 
             holder = new ViewHolder(row);
             row.setTag(holder);

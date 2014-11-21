@@ -26,7 +26,6 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.j256.ormlite.dao.ForeignCollection;
 import com.mobsandgeeks.saripaar.Rule;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NumberRule;
@@ -35,6 +34,7 @@ import com.mobsandgeeks.saripaar.annotation.Select;
 
 import org.eatech.expense.R;
 import org.eatech.expense.SourceActivity;
+import org.eatech.expense.adapter.DestinationAdapter;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
 import org.eatech.expense.db.DatabaseHelper;
 import org.eatech.expense.db.HelperFactory;
@@ -104,9 +104,9 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private DatePickerDialog            datePickerDialog;
     private Validator                   validator;
     private DatabaseHelper              dbHelper;
-    private List<CategoryEntity>        catsEntList;
     private SimpleExpandableListAdapter expAdpt;
-    private ArrayList<String> destinationList = null;
+    private Dialog                      dlgDestionation;
+    private List<DestinationEntity>     destinationEntityList;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -234,18 +234,18 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
     private void setupDestinationAdapter() throws SQLException
     {
-        destinationList = new ArrayList<String>();
-        destinationList.add(getString(R.string.msgValidationDestination));
+        DestinationAdapter<DestinationEntity> adptDstnDropDown = new DestinationAdapter<DestinationEntity>(getSherlockActivity());
+        destinationEntityList = dbHelper.getDestinationDAO().getAll();
 
-        List<CategoryEntity> categories = dbHelper.getCategoryDAO().getAll();
-        for (CategoryEntity category : categories) {
-            destinationList.add(category.getTitle());
+        for (DestinationEntity destinationEntity : destinationEntityList) {
+            adptDstnDropDown.add(destinationEntity);
         }
 
-        ArrayAdapter<String> adapterDestination = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, destinationList);
-        spinDestination.setAdapter(adapterDestination);
+        adptDstnDropDown.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        spinDestination.setAdapter(adptDstnDropDown);
         spinDestination.setSelection(0);
         spinDestination.setOnTouchListener(this);
+
     }
 
     private void setupDate()
@@ -301,13 +301,13 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     {
         if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
             try {
-                Dialog dialog = new Dialog(getSherlockActivity());
-                dialog.setContentView(android.R.layout.expandable_list_content);
-                dialog.setTitle(getString(R.string.lblDestination));
+                dlgDestionation = new Dialog(getSherlockActivity());
+                dlgDestionation.setContentView(android.R.layout.expandable_list_content);
+                dlgDestionation.setTitle(getString(R.string.lblDestination));
 
-                ExpandableListView expListView = (ExpandableListView) dialog.findViewById(android.R.id.list);
+                ExpandableListView expListView = (ExpandableListView) dlgDestionation.findViewById(android.R.id.list);
 
-                catsEntList = dbHelper.getCategoryDAO().getAll();
+                List<CategoryEntity> catsEntList = dbHelper.getCategoryDAO().getAll();
                 ArrayList<Map<String, String>> catsData = new ArrayList<Map<String, String>>();
                 ArrayList<ArrayList<Map<String, String>>> destData = new ArrayList<ArrayList<Map<String, String>>>();
                 Map<String, String> tmp;
@@ -341,7 +341,8 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
                 expListView.setAdapter(expAdpt);
                 expListView.setOnChildClickListener(this);
-                dialog.show();
+
+                dlgDestionation.show();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -354,14 +355,25 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     public boolean onChildClick(ExpandableListView parent, View view, int groupPosition,
                                 int childPosition, long id)
     {
-        JSONObject cat = null;
         try {
-            cat = new JSONObject(expAdpt.getChild(groupPosition, childPosition).toString());
-            Log.i(TAG, "" + cat.getInt("id"));
+            JSONObject cat = new JSONObject(expAdpt.getChild(groupPosition, childPosition).toString());
+            int destination_id = cat.getInt("id");
+
+            int index = 0;
+            for (DestinationEntity destinationEntity : destinationEntityList) {
+                if (destination_id == destinationEntity.getId()) {
+                    spinDestination.setSelection(index);
+                    break;
+                }
+
+                index++;
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        dlgDestionation.hide();
         return false;
     }
 }
