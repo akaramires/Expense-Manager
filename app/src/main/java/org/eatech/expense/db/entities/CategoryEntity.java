@@ -60,6 +60,8 @@ public class CategoryEntity
         this.destinations = destinations;
     }
 
+
+
     public int getId()
     {
         return Id;

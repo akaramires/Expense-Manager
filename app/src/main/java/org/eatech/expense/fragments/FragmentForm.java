@@ -26,6 +26,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.j256.ormlite.dao.ForeignCollection;
 import com.mobsandgeeks.saripaar.Rule;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NumberRule;
@@ -36,6 +37,7 @@ import org.eatech.expense.R;
 import org.eatech.expense.SourceActivity;
 import org.eatech.expense.adapter.DestinationAdapter;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
+import org.eatech.expense.adapter.SourceAdapter;
 import org.eatech.expense.db.DatabaseHelper;
 import org.eatech.expense.db.HelperFactory;
 import org.eatech.expense.db.entities.CategoryEntity;
@@ -107,6 +109,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private SimpleExpandableListAdapter expAdpt;
     private Dialog                      dlgDestionation;
     private List<DestinationEntity>     destinationEntityList;
+    private List<SourceEntity>          sourceEntityList;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -206,20 +209,17 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
     private void setupSourceAdapter() throws SQLException
     {
-        ArrayList<String> sourceList = new ArrayList<String>();
-        sourceList.add(getString(R.string.msgValidationSource));
+        SourceAdapter<SourceEntity> adptSrcDropdown = new SourceAdapter<SourceEntity>(getSherlockActivity());
+        adptSrcDropdown.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        adptSrcDropdown.add(new SourceEntity(0, getString(R.string.msgValidationSource), "0", "0", null));
 
-        List<SourceEntity> sources = dbHelper.getSourceDAO().getAll();
-        for (SourceEntity source : sources) {
-            sourceList.add(source.getTitle());
+        sourceEntityList = dbHelper.getSourceDAO().getAll();
+        for (SourceEntity srcEntity : sourceEntityList) {
+            adptSrcDropdown.add(srcEntity);
         }
 
-        ArrayAdapter<String> adapterSource = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, sourceList);
-        adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-        spinSource.setAdapter(null);
-        spinSource.setAdapter(adapterSource);
+        spinSource.setAdapter(adptSrcDropdown);
         spinSource.setSelection(0);
-
     }
 
     private void setupTypeAdapter()
@@ -234,20 +234,16 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
     private void setupDestinationAdapter() throws SQLException
     {
-        DestinationAdapter<DestinationEntity> adptDstnDropDown = new DestinationAdapter<DestinationEntity>(getSherlockActivity());
+        DestinationAdapter<DestinationEntity> adptDstnDropdown = new DestinationAdapter<DestinationEntity>(getSherlockActivity());
+        adptDstnDropdown.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        adptDstnDropdown.add(new DestinationEntity(0, null, getString(R.string.msgValidationDestination), null, 0));
+
         destinationEntityList = dbHelper.getDestinationDAO().getAll();
-
-        DestinationEntity emptyEnt = new DestinationEntity();
-        emptyEnt.setId(0);
-        emptyEnt.setTitle(getString(R.string.msgValidationDestination));
-        adptDstnDropDown.add(emptyEnt);
-
         for (DestinationEntity destinationEntity : destinationEntityList) {
-            adptDstnDropDown.add(destinationEntity);
+            adptDstnDropdown.add(destinationEntity);
         }
 
-        adptDstnDropDown.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        spinDestination.setAdapter(adptDstnDropDown);
+        spinDestination.setAdapter(adptDstnDropdown);
         spinDestination.setSelection(0);
         spinDestination.setOnTouchListener(this);
 

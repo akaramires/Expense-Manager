@@ -14,21 +14,21 @@ import android.widget.TextView;
 
 import org.eatech.expense.db.entities.SourceEntity;
 
-import java.sql.SQLException;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class SourceAdapter<S> extends ArrayAdapter<SourceEntity>
 {
     private static final String TAG = "Expense-" + SourceAdapter.class.getSimpleName();
+    private final int layout;
 
     private Context context;
 
-    public SourceAdapter(Context c)
+    public SourceAdapter(Context context)
     {
-        super(c, android.R.layout.simple_list_item_1);
-        this.context = c;
+        super(context, android.R.layout.simple_spinner_item);
+        this.context = context;
+        this.layout = android.R.layout.simple_spinner_item;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SourceAdapter<S> extends ArrayAdapter<SourceEntity>
 
         if (row == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            row = inflater.inflate(this.layout, parent, false);
 
             holder = new ViewHolder(row);
             row.setTag(holder);
@@ -48,11 +48,7 @@ public class SourceAdapter<S> extends ArrayAdapter<SourceEntity>
             holder = (ViewHolder) row.getTag();
         }
 
-        try {
-            holder.text.setText(sourceEntity.getTitle() + " (" + sourceEntity.getCurrency().getCode() + ")");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        holder.text.setText(sourceEntity.getTitle());
 
         return row;
     }
