@@ -130,6 +130,11 @@ public class DestinationEntity
     @Override
     public String toString()
     {
+        return title;
+    }
+
+    public String toStringFull()
+    {
         return "DestinationEntity{" +
             "Id=" + Id +
             ", category=" + category +

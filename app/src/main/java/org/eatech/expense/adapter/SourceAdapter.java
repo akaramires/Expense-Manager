@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
+import org.eatech.expense.R;
 import org.eatech.expense.db.entities.SourceEntity;
 
 import butterknife.ButterKnife;
@@ -26,13 +29,13 @@ public class SourceAdapter<S> extends ArrayAdapter<SourceEntity>
 
     public SourceAdapter(Context context)
     {
-        super(context, android.R.layout.simple_spinner_item);
+        super(context, R.layout.sherlock_spinner_dropdown_item);
         this.context = context;
-        this.layout = android.R.layout.simple_spinner_item;
+        this.layout = R.layout.sherlock_spinner_dropdown_item;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
+    public View getDropDownView(int position, View convertView, ViewGroup parent)
     {
         SourceEntity sourceEntity = getItem(position);
         View row = convertView;

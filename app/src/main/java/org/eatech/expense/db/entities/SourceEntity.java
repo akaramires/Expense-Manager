@@ -130,6 +130,11 @@ public class SourceEntity
     @Override
     public String toString()
     {
+        return title;
+    }
+
+    public String toStringFull()
+    {
         return "SourceEntity{" +
             "Id=" + Id +
             ", title=" + title +

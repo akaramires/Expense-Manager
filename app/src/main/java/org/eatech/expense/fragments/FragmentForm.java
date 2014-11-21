@@ -210,7 +210,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private void setupSourceAdapter() throws SQLException
     {
         SourceAdapter<SourceEntity> adptSrcDropdown = new SourceAdapter<SourceEntity>(getSherlockActivity());
-        adptSrcDropdown.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        adptSrcDropdown.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         adptSrcDropdown.add(new SourceEntity(0, getString(R.string.msgValidationSource), "0", "0", null));
 
         sourceEntityList = dbHelper.getSourceDAO().getAll();
@@ -235,7 +235,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private void setupDestinationAdapter() throws SQLException
     {
         DestinationAdapter<DestinationEntity> adptDstnDropdown = new DestinationAdapter<DestinationEntity>(getSherlockActivity());
-        adptDstnDropdown.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        adptDstnDropdown.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
         adptDstnDropdown.add(new DestinationEntity(0, null, getString(R.string.msgValidationDestination), null, 0));
 
         destinationEntityList = dbHelper.getDestinationDAO().getAll();
