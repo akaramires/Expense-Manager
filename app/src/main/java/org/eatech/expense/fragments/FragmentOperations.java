@@ -22,11 +22,6 @@ import org.eatech.expense.db.dao.OperationDao;
 import org.eatech.expense.db.entities.OperationEntity;
 
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -62,12 +57,6 @@ public class FragmentOperations extends SherlockListFragment
             operationDao = dbHelper.getOperationDAO();
             operationAdapter = new OperationAdapter(getSherlockActivity());
 
-            List<OperationEntity> operationsAll = operationDao.getAll();
-            Log.i(TAG, "operationsAll count=" + operationsAll.size());
-            for (OperationEntity operationEntity : operationsAll) {
-                Log.i(TAG, operationEntity.toString());
-            }
-
             List<OperationEntity> operations = operationDao.getCurrentMonth();
             Log.i(TAG, "operations count=" + operations.size());
             for (OperationEntity operationEntity : operations) {
@@ -79,5 +68,32 @@ public class FragmentOperations extends SherlockListFragment
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            try {
+                setAdapter();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setAdapter() throws SQLException
+    {
+        if (!operationAdapter.isEmpty()) {
+            operationAdapter.clear();
+        }
+
+        List<OperationEntity> operations = operationDao.getCurrentMonth();
+        Log.i(TAG, "operations count=" + operations.size());
+        for (OperationEntity operationEntity : operations) {
+            operationAdapter.add(operationEntity);
+        }
+        operationAdapter.notifyDataSetChanged();
     }
 }

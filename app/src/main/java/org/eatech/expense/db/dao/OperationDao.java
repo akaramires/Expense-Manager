@@ -59,12 +59,8 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         calendarMax.set(Calendar.MILLISECOND, 999);
         long max_date = calendarMax.getTimeInMillis();
 
-        return this.queryBuilder()
-            .orderBy(OperationEntity.COL_DATE, false)
-            .where()
-            .ge(OperationEntity.COL_DATE, min_date)
-            .and()
-            .le(OperationEntity.COL_DATE, max_date)
+        return this.queryBuilder().orderBy(OperationEntity.COL_DATE, false)
+            .where().ge(OperationEntity.COL_DATE, min_date).and().le(OperationEntity.COL_DATE, max_date)
             .query();
     }
 
