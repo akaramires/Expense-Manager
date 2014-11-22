@@ -6,6 +6,7 @@
 package org.eatech.expense.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,6 @@ public class OperationAdapter extends ArrayAdapter<OperationEntity>
 
         try {
             holder.tvTitle.setText(operationEntity.getDestination().getTitle());
-            holder.tvSum.setText(String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
 
             DateFormat dfDay = new SimpleDateFormat("d");
             String dateDay = dfDay.format(new Date(operationEntity.getDate()));
@@ -66,6 +66,17 @@ public class OperationAdapter extends ArrayAdapter<OperationEntity>
             DateFormat dfMonth = new SimpleDateFormat("MMM");
             String dateMonth = dfMonth.format(new Date(operationEntity.getDate()));
             holder.tvDateMonth.setText(dateMonth);
+
+            switch (operationEntity.getType_id()) {
+                case 0:
+                    holder.tvSum.setTextColor(Color.parseColor("red"));
+                    holder.tvSum.setText("-" + String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
+                    break;
+                case 1:
+                    holder.tvSum.setTextColor(Color.parseColor("blue"));
+                    holder.tvSum.setText(String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
+                    break;
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
