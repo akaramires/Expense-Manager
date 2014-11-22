@@ -88,7 +88,7 @@
             <ImageButton
                 android:id="@+id/ibSource"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:src="@drawable/ic_action_search"
                 android:background="@drawable/selectable_background_expense"
                 android:layout_weight="1"/>
@@ -131,7 +131,7 @@
             <ImageButton
                 android:id="@+id/ibDestination"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:src="@drawable/ic_action_search"
                 android:background="@drawable/selectable_background_expense"
                 android:layout_weight="1"/>
