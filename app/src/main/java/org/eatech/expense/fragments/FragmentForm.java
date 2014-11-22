@@ -207,6 +207,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         etCount.setText("1");
         etCount.addTextChangedListener(new AmountTotal());
         etCost.addTextChangedListener(new AmountTotal());
+        etCost.requestFocus();
     }
 
     private class AmountTotal implements TextWatcher
@@ -238,9 +239,11 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         spinSource.setSelection(0);
         spinDestination.setSelection(0);
         etDate.setText(dateFormatter.format(new Date().getTime()));
-        etCount.setText("");
+        etCount.setText("1");
         etCost.setText("");
         etComment.setText("");
+        etCost.requestFocus();
+        outTotal.setText("0");
     }
 
     private void initAdapterSource() throws SQLException
@@ -292,6 +295,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private void initDate()
     {
         etDate.setText(dateFormatter.format(new Date().getTime()));
+        etDate.setFocusable(false);
         dialogDatePicker = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
         {
 

@@ -9,6 +9,9 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import org.eatech.expense.db.HelperFactory;
+
+import java.sql.SQLException;
 import java.util.Date;
 
 @DatabaseTable(tableName = "operations")
@@ -113,9 +116,9 @@ public class OperationEntity
         this.type_id = type_id;
     }
 
-    public SourceEntity getSource()
+    public SourceEntity getSource() throws SQLException
     {
-        return source;
+        return HelperFactory.getInstance().getHelper().getSourceDAO().queryForId(source.getId());
     }
 
     public void setSource(SourceEntity source)
@@ -123,9 +126,9 @@ public class OperationEntity
         this.source = source;
     }
 
-    public DestinationEntity getDestination()
+    public DestinationEntity getDestination() throws SQLException
     {
-        return destination;
+        return HelperFactory.getInstance().getHelper().getDestinationDAO().queryForId(destination.getId());
     }
 
     public void setDestination(DestinationEntity destination)
