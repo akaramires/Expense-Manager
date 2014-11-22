@@ -18,7 +18,7 @@ import java.util.List;
 
 public class DestinationDao extends BaseDaoImpl<DestinationEntity, Integer>
 {
-    private static final String TAG = "LOGAMP-" + DestinationDao.class.getSimpleName();
+    private static final String TAG = "Expense-" + DestinationDao.class.getSimpleName();
 
     public DestinationDao(ConnectionSource connectionSource,
                           Class<DestinationEntity> dataClass) throws SQLException

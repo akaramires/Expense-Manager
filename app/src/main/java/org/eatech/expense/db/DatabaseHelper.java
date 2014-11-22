@@ -16,10 +16,12 @@ import com.j256.ormlite.table.TableUtils;
 import org.eatech.expense.db.dao.CategoryDao;
 import org.eatech.expense.db.dao.CurrencyDao;
 import org.eatech.expense.db.dao.DestinationDao;
+import org.eatech.expense.db.dao.OperationDao;
 import org.eatech.expense.db.dao.SourceDao;
 import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.CurrencyEntity;
 import org.eatech.expense.db.entities.DestinationEntity;
+import org.eatech.expense.db.entities.OperationEntity;
 import org.eatech.expense.db.entities.SourceEntity;
 
 import java.sql.SQLException;
@@ -31,11 +33,12 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
     private static final String TAG = "Expense-" + DatabaseHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME    = "expense.sqlite";
-    private static final int    DATABASE_VERSION = 5;
+    private static final int    DATABASE_VERSION = 6;
     private CurrencyDao    currencyDao;
     private SourceDao      sourceDao;
     private CategoryDao    categoryDao;
     private DestinationDao destinationDao;
+    private OperationDao   operationDao;
 
     public DatabaseHelper(Context context)
     {
@@ -77,9 +80,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
                 "(`title`,    `category_id`, `type`, `editable`, `created_at`) VALUES " +
                 "('Бензин',   1,             'out',   0,         '" + curDate + "')," +
                 "('Масло',    1,             'out',   0,         '" + curDate + "')," +
-                "('Зарплата', 2,             'in',    0,         '" + curDate + "')" +
+                "('Зарплата', 3,             'in',    0,         '" + curDate + "')" +
                 ";");
 
+            TableUtils.createTable(connectionSource, OperationEntity.class);
         } catch (SQLException e) {
             Log.e(TAG, "Error creating DB " + DATABASE_NAME);
             e.printStackTrace();
@@ -91,6 +95,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
                           int oldVersion, int newVersion)
     {
         try {
+            TableUtils.dropTable(connectionSource, OperationEntity.class, true);
             TableUtils.dropTable(connectionSource, CurrencyEntity.class, true);
             TableUtils.dropTable(connectionSource, SourceEntity.class, true);
             TableUtils.dropTable(connectionSource, CategoryEntity.class, true);
@@ -139,11 +144,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
         return destinationDao;
     }
 
+    public OperationDao getOperationDAO() throws SQLException
+    {
+        if (operationDao == null) {
+            operationDao = new OperationDao(getConnectionSource(), OperationEntity.class);
+        }
+
+        return operationDao;
+    }
+
     @Override
     public void close()
     {
         super.close();
         currencyDao = null;
         sourceDao = null;
+        categoryDao = null;
+        destinationDao = null;
+        operationDao = null;
     }
 }

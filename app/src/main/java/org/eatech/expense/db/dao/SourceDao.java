@@ -17,7 +17,7 @@ import java.util.List;
 
 public class SourceDao extends BaseDaoImpl<SourceEntity, Integer>
 {
-    private static final String TAG = "LOGAMP-" + SourceDao.class.getSimpleName();
+    private static final String TAG = "Expense-" + SourceDao.class.getSimpleName();
 
     public SourceDao(ConnectionSource connectionSource,
                      Class<SourceEntity> dataClass) throws SQLException

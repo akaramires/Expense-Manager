@@ -17,7 +17,7 @@ import java.util.List;
 
 public class CurrencyDao extends BaseDaoImpl<CurrencyEntity, Integer>
 {
-    private static final String TAG = "LOGAMP-" + CurrencyDao.class.getSimpleName();
+    private static final String TAG = "Expense-" + CurrencyDao.class.getSimpleName();
 
     public CurrencyDao(ConnectionSource connectionSource,
                        Class<CurrencyEntity> dataClass) throws SQLException

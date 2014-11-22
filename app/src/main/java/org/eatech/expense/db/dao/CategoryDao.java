@@ -17,7 +17,7 @@ import java.util.List;
 
 public class CategoryDao extends BaseDaoImpl<CategoryEntity, Integer>
 {
-    private static final String TAG = "LOGAMP-" + CategoryDao.class.getSimpleName();
+    private static final String TAG = "Expense-" + CategoryDao.class.getSimpleName();
 
     public CategoryDao(ConnectionSource connectionSource,
                        Class<CategoryEntity> dataClass) throws SQLException

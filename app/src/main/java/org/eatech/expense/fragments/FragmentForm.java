@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -43,12 +44,14 @@ import org.eatech.expense.db.DatabaseHelper;
 import org.eatech.expense.db.HelperFactory;
 import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.DestinationEntity;
+import org.eatech.expense.db.entities.OperationEntity;
 import org.eatech.expense.db.entities.SourceEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -106,12 +109,15 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private Calendar         maxDate;
     private Calendar         current;
 
-    private DatePickerDialog            datePickerDialog;
-    private Validator                   validator;
-    private DatabaseHelper              dbHelper;
-    private SimpleExpandableListAdapter expAdpt;
-    private Dialog                      dlgDestionation;
-    private List<DestinationEntity>     destinationEntityList;
+    private Validator                             validator;
+    private DatabaseHelper                        dbHelper;
+    private Dialog                                dialogDestionation;
+    private DatePickerDialog                      dialogDatePicker;
+    private SourceAdapter<SourceEntity>           adapterSource;
+    private ArrayAdapter<String>                  adapterType;
+    private DestinationAdapter<DestinationEntity> adapterDestination;
+    private SimpleExpandableListAdapter           adapterDestinationExp;
+    private List<DestinationEntity>               listDestination;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -169,7 +175,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     {
         switch (view.getId()) {
             case R.id.etDate:
-                datePickerDialog.show();
+                dialogDatePicker.show();
                 break;
             case R.id.ibSource:
                 Intent intent = new Intent(getSherlockActivity(), SourceActivity.class);
@@ -184,7 +190,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         try {
-            setupSourceAdapter();
+            initAdapterSource();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -192,10 +198,10 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
     private void setupForm() throws SQLException
     {
-        setupTypeAdapter();
-        setupSourceAdapter();
-        setupDestinationAdapter();
-        setupDate();
+        initAdapterType();
+        initAdapterSource();
+        initAdapterDestination();
+        initDate();
 
         outTotal.setText("0");
         etCount.setText("1");
@@ -237,52 +243,56 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         etComment.setText("");
     }
 
-    private void setupSourceAdapter() throws SQLException
+    private void initAdapterSource() throws SQLException
     {
-        SourceAdapter<SourceEntity> adptSrcDropdown = new SourceAdapter<SourceEntity>(getSherlockActivity());
-        adptSrcDropdown.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-        adptSrcDropdown.add(new SourceEntity(0, getString(R.string.msgValidationSource), "0", "0", null));
+        adapterSource = new SourceAdapter<SourceEntity>(getSherlockActivity());
+        adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+        adapterSource.add(new SourceEntity(0, getString(R.string.msgValidationSource), "0", "0", null));
 
         List<SourceEntity> sourceEntityList = dbHelper.getSourceDAO().getAll();
         for (SourceEntity srcEntity : sourceEntityList) {
-            adptSrcDropdown.add(srcEntity);
+            adapterSource.add(srcEntity);
         }
 
-        spinSource.setAdapter(adptSrcDropdown);
+        spinSource.setAdapter(adapterSource);
         spinSource.setSelection(0);
     }
 
-    private void setupTypeAdapter()
+    private void initAdapterType()
     {
-        String[] typesList = getResources().getStringArray(R.array.lblTypes);
-
-        ArrayAdapter<String> adapterType = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item, typesList);
+        adapterType = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item);
         adapterType.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+
+        String[] types = getResources().getStringArray(R.array.lblTypes);
+        for (String type : types) {
+            adapterType.add(type);
+        }
+
         spinType.setAdapter(adapterType);
         spinType.setSelection(0);
     }
 
-    private void setupDestinationAdapter() throws SQLException
+    private void initAdapterDestination() throws SQLException
     {
-        DestinationAdapter<DestinationEntity> adptDstnDropdown = new DestinationAdapter<DestinationEntity>(getSherlockActivity());
-        adptDstnDropdown.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
-        adptDstnDropdown.add(new DestinationEntity(0, null, getString(R.string.msgValidationDestination), null, 0));
+        adapterDestination = new DestinationAdapter<DestinationEntity>(getSherlockActivity());
+        adapterDestination.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+        adapterDestination.add(new DestinationEntity(0, null, getString(R.string.msgValidationDestination), null, 0));
 
-        destinationEntityList = dbHelper.getDestinationDAO().getAll();
-        for (DestinationEntity destinationEntity : destinationEntityList) {
-            adptDstnDropdown.add(destinationEntity);
+        listDestination = dbHelper.getDestinationDAO().getAll();
+        for (DestinationEntity destinationEntity : listDestination) {
+            adapterDestination.add(destinationEntity);
         }
 
-        spinDestination.setAdapter(adptDstnDropdown);
+        spinDestination.setAdapter(adapterDestination);
         spinDestination.setSelection(0);
         spinDestination.setOnTouchListener(this);
 
     }
 
-    private void setupDate()
+    private void initDate()
     {
         etDate.setText(dateFormatter.format(new Date().getTime()));
-        datePickerDialog = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
+        dialogDatePicker = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
         {
 
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
@@ -295,9 +305,84 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     }
 
     @Override
-    public void onValidationSucceeded()
+    public boolean onTouch(View view, MotionEvent motionEvent)
     {
-        Log.i(TAG, "YES!!!");
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            try {
+                dialogDestionation = new Dialog(getSherlockActivity());
+                dialogDestionation.setContentView(android.R.layout.expandable_list_content);
+                dialogDestionation.setTitle(getString(R.string.lblDestination));
+
+                ExpandableListView expListView = (ExpandableListView) dialogDestionation.findViewById(android.R.id.list);
+
+                List<CategoryEntity> catsEntList = dbHelper.getCategoryDAO().getAll();
+                ArrayList<Map<String, String>> catsData = new ArrayList<Map<String, String>>();
+                ArrayList<ArrayList<Map<String, String>>> destData = new ArrayList<ArrayList<Map<String, String>>>();
+                Map<String, String> tmp;
+
+                for (CategoryEntity cat : catsEntList) {
+                    tmp = new HashMap<String, String>();
+                    tmp.put("id", String.valueOf(cat.getId()));
+                    tmp.put("title", cat.getTitle());
+                    catsData.add(tmp);
+
+                    ArrayList<Map<String, String>> destDataItem = new ArrayList<Map<String, String>>();
+                    for (DestinationEntity dest : cat.getDestinations()) {
+                        tmp = new HashMap<String, String>();
+                        tmp.put("id", String.valueOf(dest.getId()));
+                        tmp.put("title", dest.getTitle());
+                        destDataItem.add(tmp);
+                    }
+                    destData.add(destDataItem);
+                }
+
+                adapterDestinationExp = new SimpleExpandableListAdapter(
+                    getSherlockActivity(),
+                    catsData,
+                    android.R.layout.simple_expandable_list_item_1,
+                    new String[] { "title" },
+                    new int[] { android.R.id.text1 },
+                    destData,
+                    android.R.layout.simple_list_item_1,
+                    new String[] { "title" },
+                    new int[] { android.R.id.text1 });
+
+                expListView.setAdapter(adapterDestinationExp);
+                expListView.setOnChildClickListener(this);
+
+                dialogDestionation.show();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View view, int groupPosition,
+                                int childPosition, long id)
+    {
+        try {
+            JSONObject cat = new JSONObject(adapterDestinationExp.getChild(groupPosition, childPosition).toString());
+            int destination_id = cat.getInt("id");
+
+            int index = 1;
+            for (DestinationEntity destinationEntity : listDestination) {
+                if (destination_id == destinationEntity.getId()) {
+                    spinDestination.setSelection(index);
+                    break;
+                }
+
+                index++;
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        dialogDestionation.hide();
+        return false;
     }
 
     @Override
@@ -328,83 +413,36 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     }
 
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent)
-    {
-        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            try {
-                dlgDestionation = new Dialog(getSherlockActivity());
-                dlgDestionation.setContentView(android.R.layout.expandable_list_content);
-                dlgDestionation.setTitle(getString(R.string.lblDestination));
-
-                ExpandableListView expListView = (ExpandableListView) dlgDestionation.findViewById(android.R.id.list);
-
-                List<CategoryEntity> catsEntList = dbHelper.getCategoryDAO().getAll();
-                ArrayList<Map<String, String>> catsData = new ArrayList<Map<String, String>>();
-                ArrayList<ArrayList<Map<String, String>>> destData = new ArrayList<ArrayList<Map<String, String>>>();
-                Map<String, String> tmp;
-
-                for (CategoryEntity cat : catsEntList) {
-                    tmp = new HashMap<String, String>();
-                    tmp.put("id", String.valueOf(cat.getId()));
-                    tmp.put("title", cat.getTitle());
-                    catsData.add(tmp);
-
-                    ArrayList<Map<String, String>> destDataItem = new ArrayList<Map<String, String>>();
-                    for (DestinationEntity dest : cat.getDestinations()) {
-                        tmp = new HashMap<String, String>();
-                        tmp.put("id", String.valueOf(dest.getId()));
-                        tmp.put("title", dest.getTitle());
-                        destDataItem.add(tmp);
-                    }
-                    destData.add(destDataItem);
-                }
-
-                expAdpt = new SimpleExpandableListAdapter(
-                    getSherlockActivity(),
-                    catsData,
-                    android.R.layout.simple_expandable_list_item_1,
-                    new String[] { "title" },
-                    new int[] { android.R.id.text1 },
-                    destData,
-                    android.R.layout.simple_list_item_1,
-                    new String[] { "title" },
-                    new int[] { android.R.id.text1 });
-
-                expListView.setAdapter(expAdpt);
-                expListView.setOnChildClickListener(this);
-
-                dlgDestionation.show();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onChildClick(ExpandableListView parent, View view, int groupPosition,
-                                int childPosition, long id)
+    public void onValidationSucceeded()
     {
         try {
-            JSONObject cat = new JSONObject(expAdpt.getChild(groupPosition, childPosition).toString());
-            int destination_id = cat.getInt("id");
+            int type_position = spinType.getSelectedItemPosition();
 
-            int index = 1;
-            for (DestinationEntity destinationEntity : destinationEntityList) {
-                if (destination_id == destinationEntity.getId()) {
-                    spinDestination.setSelection(index);
-                    break;
-                }
+            Date d = new SimpleDateFormat("dd-MM-yyyy").parse(etDate.getText().toString());
+            long date = d.getTime();
 
-                index++;
+            SourceEntity source = adapterSource.getItem(spinSource.getSelectedItemPosition());
+            DestinationEntity destination = adapterDestination.getItem(spinDestination.getSelectedItemPosition());
+
+            int count = Integer.parseInt(etCount.getText().toString());
+            double cost = Double.parseDouble(etCost.getText().toString());
+            String comment = etComment.getText().toString();
+
+            OperationEntity operationEntity = new OperationEntity(date, type_position, source,
+                destination, count, cost, comment);
+
+            int created = dbHelper.getOperationDAO().createOperation(operationEntity);
+            if (created > 0) {
+                clearForm();
+                Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessAddOperation), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getSherlockActivity(), getString(R.string.msgErrorAddOperation), Toast.LENGTH_SHORT).show();
             }
 
-        } catch (JSONException e) {
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        dlgDestionation.hide();
-        return false;
     }
 }
