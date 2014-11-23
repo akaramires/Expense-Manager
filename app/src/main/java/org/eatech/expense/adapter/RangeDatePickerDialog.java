@@ -14,8 +14,8 @@ import java.util.Calendar;
 public class RangeDatePickerDialog extends DatePickerDialog
 {
 
-    private Calendar             minDate;
-    private Calendar             maxDate;
+    public  Calendar             minDate;
+    public  Calendar             maxDate;
     private java.text.DateFormat mTitleDateFormat;
 
     public RangeDatePickerDialog(Context context, OnDateSetListener callBack, Calendar date,

@@ -18,7 +18,7 @@ public class HelperDate
         return calendar;
     }
 
-    public static long getStartCurrentMonth()
+    public static Calendar getStartCurrentMonthCal()
     {
         Calendar calendar = getCalendar();
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
@@ -27,10 +27,15 @@ public class HelperDate
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        return calendar.getTimeInMillis();
+        return calendar;
     }
 
-    public static long getEndCurrentMonth()
+    public static long getStartCurrentMonth()
+    {
+        return getStartCurrentMonthCal().getTimeInMillis();
+    }
+
+    public static Calendar getEndCurrentMonthCal()
     {
         Calendar calendar = getCalendar();
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -39,6 +44,11 @@ public class HelperDate
         calendar.set(Calendar.SECOND, 59);
         calendar.set(Calendar.MILLISECOND, 999);
 
-        return calendar.getTimeInMillis();
+        return calendar;
+    }
+
+    public static long getEndCurrentMonth()
+    {
+        return getEndCurrentMonthCal().getTimeInMillis();
     }
 }

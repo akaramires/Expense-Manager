@@ -40,6 +40,7 @@
     <string name="action_clear">Очистить</string>
     <string name="action_edit">Редактировать</string>
     <string name="action_delete">Удалить</string>
+    <string name="action_calendar">Календарь</string>
 
     <string name="msgValidationCount">Количество не может быть меньше 1</string>
     <string name="msgValidationCost">Сумма не может быть меньше 0,01</string>

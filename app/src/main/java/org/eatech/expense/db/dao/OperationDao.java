@@ -35,24 +35,6 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         return this.queryForAll();
     }
 
-    public com.j256.ormlite.stmt.Where<OperationEntity, Integer> getCurrentMonthBase() throws SQLException
-    {
-        Log.i(TAG, "getCurrentMonthBase()");
-
-        return this.queryBuilder().orderBy(OperationEntity.COL_DATE, false)
-            .where()
-            .ge(OperationEntity.COL_DATE, HelperDate.getStartCurrentMonth())
-            .and()
-            .le(OperationEntity.COL_DATE, HelperDate.getEndCurrentMonth());
-    }
-
-    public List<OperationEntity> getCurrentMonth() throws SQLException
-    {
-        Log.i(TAG, "getCurrentMonth()");
-
-        return this.getCurrentMonthBase().query();
-    }
-
     public int createOperation(OperationEntity operationEntity) throws SQLException
     {
         Log.i(TAG, "createOperation(" + operationEntity.toString() + ")");
@@ -60,14 +42,34 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         return this.create(operationEntity);
     }
 
-    public double getInAtCurMonth() throws SQLException
+    public Where<OperationEntity, Integer> getAllByPeriodBuilder(long date_start,
+                                                                 long date_end) throws SQLException
     {
-        Log.i(TAG, "getInAtCurMonth()");
+        Log.i(TAG, "getAllByPeriodBuilder()");
 
-        List<OperationEntity> oprtns = this
-            .getCurrentMonthBase()
+        return this.queryBuilder().orderBy(OperationEntity.COL_DATE, false)
+            .where()
+            .ge(OperationEntity.COL_DATE, date_start)
             .and()
-            .eq(OperationEntity.COL_TYPE_ID, 1)
+            .le(OperationEntity.COL_DATE, date_end);
+    }
+
+    public List<OperationEntity> getAllByPeriod(long date_start, long date_end) throws SQLException
+    {
+        Log.i(TAG, "getAllByPeriod()");
+
+        return this.getAllByPeriodBuilder(date_start, date_end)
+            .and()
+            .le(OperationEntity.COL_DATE, date_end)
+            .query();
+    }
+
+    public double getInByPeriod(long date_start, long date_end) throws SQLException
+    {
+        Log.i(TAG, "getInByPeriod()");
+
+        List<OperationEntity> oprtns = this.getAllByPeriodBuilder(date_start, date_end)
+            .and().eq(OperationEntity.COL_TYPE_ID, 1)
             .query();
 
         double in = 0;
@@ -78,14 +80,12 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         return in;
     }
 
-    public double getOutAtCurMonth() throws SQLException
+    public double getOutByPeriod(long date_start, long date_end) throws SQLException
     {
-        Log.i(TAG, "getInAtCurMonth()");
+        Log.i(TAG, "getOutByPeriod()");
 
-        List<OperationEntity> oprtns = this
-            .getCurrentMonthBase()
-            .and()
-            .eq(OperationEntity.COL_TYPE_ID, 0)
+        List<OperationEntity> oprtns = this.getAllByPeriodBuilder(date_start, date_end)
+            .and().eq(OperationEntity.COL_TYPE_ID, 0)
             .query();
 
         double in = 0;
