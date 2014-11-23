@@ -79,7 +79,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     EditText etDate;
 
     @InjectView(R.id.spinSource)
-    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
+//    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
     Spinner spinSource;
 
     @InjectView(R.id.spinDestination)
@@ -450,7 +450,8 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
             Date d = new SimpleDateFormat("dd-MM-yyyy").parse(etDate.getText().toString());
             long date = d.getTime();
 
-            SourceEntity source = adapterSource.getItem(spinSource.getSelectedItemPosition());
+            // SourceEntity source = adapterSource.getItem(spinSource.getSelectedItemPosition());
+            SourceEntity source = dbHelper.getSourceDAO().queryForId(1);
             DestinationEntity destination = adapterDestination.getItem(spinDestination.getSelectedItemPosition());
 
             int count = Integer.parseInt(etCount.getText().toString());

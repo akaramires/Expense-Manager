@@ -6,7 +6,6 @@
 package org.eatech.expense.fragments;
 
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -26,7 +25,6 @@ import com.actionbarsherlock.view.MenuItem;
 
 import org.eatech.expense.HelperDate;
 import org.eatech.expense.R;
-import org.eatech.expense.SourceActivity;
 import org.eatech.expense.adapter.OperationAdapter;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
 import org.eatech.expense.db.DatabaseHelper;
@@ -37,8 +35,6 @@ import org.eatech.expense.db.entities.OperationEntity;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -94,7 +90,7 @@ public class FragmentOperations extends SherlockListFragment
             current = Calendar.getInstance();
 
             initDateFilter();
-            setVars();
+            initVars();
 
             List<OperationEntity> operations = operationDao.getAllByPeriod(date_start.getTimeInMillis(), date_end.getTimeInMillis());
             Log.i(TAG, "operations count=" + operations.size());
@@ -158,7 +154,7 @@ public class FragmentOperations extends SherlockListFragment
         }
     }
 
-    private void setVars() throws SQLException
+    private void initVars() throws SQLException
     {
         if (dbHelper == null) {
             dbHelper = HelperFactory.getInstance().getHelper();
@@ -174,7 +170,7 @@ public class FragmentOperations extends SherlockListFragment
 
     private void setAdapter() throws SQLException
     {
-        setVars();
+        initVars();
 
         if (!operationAdapter.isEmpty()) {
             operationAdapter.clear();
@@ -232,7 +228,7 @@ public class FragmentOperations extends SherlockListFragment
                     e.printStackTrace();
                 }
             }
-        }, current, null, date_end);
+        }, date_start, null, date_end);
 
         etEnd.setText(dateFormatter.format(date_end.getTimeInMillis()));
         etEnd.setFocusable(false);
@@ -251,7 +247,7 @@ public class FragmentOperations extends SherlockListFragment
                     e.printStackTrace();
                 }
             }
-        }, current, date_start, null);
+        }, date_end, date_start, null);
     }
 
     @OnClick({ R.id.etStart, R.id.etEnd })
