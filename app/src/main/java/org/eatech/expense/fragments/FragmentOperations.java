@@ -122,6 +122,14 @@ public class FragmentOperations extends SherlockListFragment
         switch (item.getItemId()) {
             case R.id.action_edit:
                 return true;
+            case R.id.action_delete:
+                try {
+                    operationDao.delete(operationEntity);
+                    setAdapter();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                return true;
             default:
                 return super.onContextItemSelected(item);
         }

@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -108,6 +109,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private SimpleDateFormat dateFormatter;
     private Calendar         maxDate;
     private Calendar         current;
+    private String current_type = "out";
 
     private Validator                             validator;
     private DatabaseHelper                        dbHelper;
@@ -266,13 +268,34 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         adapterType = new ArrayAdapter<String>(getSherlockActivity(), android.R.layout.simple_spinner_item);
         adapterType.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 
-        String[] types = getResources().getStringArray(R.array.lblTypes);
+        final String[] types = getResources().getStringArray(R.array.lblTypes);
         for (String type : types) {
             adapterType.add(type);
         }
 
         spinType.setAdapter(adapterType);
         spinType.setSelection(0);
+        spinType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id)
+            {
+                String curType = spinType.getAdapter().getItem(position).toString();
+                if (types[0].equals(curType)) {
+                    current_type = "out";
+                } else if (types[1].equals(curType)) {
+                    current_type = "in";
+                }
+                spinDestination.setSelection(0);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView)
+            {
+            }
+        });
     }
 
     private void initAdapterDestination() throws SQLException
@@ -332,10 +355,12 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
                     ArrayList<Map<String, String>> destDataItem = new ArrayList<Map<String, String>>();
                     for (DestinationEntity dest : cat.getDestinations()) {
-                        tmp = new HashMap<String, String>();
-                        tmp.put("id", String.valueOf(dest.getId()));
-                        tmp.put("title", dest.getTitle());
-                        destDataItem.add(tmp);
+                        if (dest.getType().equals(current_type)) {
+                            tmp = new HashMap<String, String>();
+                            tmp.put("id", String.valueOf(dest.getId()));
+                            tmp.put("title", dest.getTitle());
+                            destDataItem.add(tmp);
+                        }
                     }
                     destData.add(destDataItem);
                 }

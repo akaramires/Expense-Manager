@@ -32,4 +32,18 @@ public class DestinationDao extends BaseDaoImpl<DestinationEntity, Integer>
 
         return this.queryForAll();
     }
+
+    public List<DestinationEntity> getAllIn() throws SQLException
+    {
+        Log.i(TAG, "getAllIn()");
+
+        return this.queryBuilder().where().eq(DestinationEntity.COL_TITLE, "in").query();
+    }
+
+    public List<DestinationEntity> getAllOut() throws SQLException
+    {
+        Log.i(TAG, "getAllOut()");
+
+        return this.queryBuilder().where().eq(DestinationEntity.COL_TITLE, "out").query();
+    }
 }
