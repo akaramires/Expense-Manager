@@ -5,10 +5,12 @@
 
 package org.eatech.expense.fragments;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -36,6 +38,7 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NumberRule;
 import com.mobsandgeeks.saripaar.annotation.Select;
 
+import org.eatech.expense.MainActivity;
 import org.eatech.expense.R;
 import org.eatech.expense.SourceActivity;
 import org.eatech.expense.adapter.DestinationAdapter;
@@ -120,6 +123,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     private DestinationAdapter<DestinationEntity> adapterDestination;
     private SimpleExpandableListAdapter           adapterDestinationExp;
     private List<DestinationEntity>               listDestination;
+    private MainActivity                          mainActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -148,6 +152,13 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        mainActivity = (MainActivity) activity;
     }
 
     @Override
@@ -461,18 +472,83 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
             OperationEntity operationEntity = new OperationEntity(date, OperationEntity.pos2type(type), source, destination, count, cost, comment);
 
-            int created = dbHelper.getOperationDAO().createOperation(operationEntity);
-            if (created > 0) {
-                clearForm();
-                Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessAddOperation), Toast.LENGTH_SHORT).show();
+            String msg = "";
+            if (mainActivity.tmp_oper_id > 0) {
+                operationEntity.setId(mainActivity.tmp_oper_id);
+
+                if (dbHelper.getOperationDAO().updateOperation(operationEntity) > 0) {
+                    clearForm();
+                    msg = getString(R.string.msgSuccessUpdateOperation);
+                } else {
+                    msg = getString(R.string.msgErrorUpdateOperation);
+                }
             } else {
-                Toast.makeText(getSherlockActivity(), getString(R.string.msgErrorAddOperation), Toast.LENGTH_SHORT).show();
+                if (dbHelper.getOperationDAO().createOperation(operationEntity) > 0) {
+                    clearForm();
+                    msg = getString(R.string.msgSuccessAddOperation);
+                } else {
+                    msg = getString(R.string.msgErrorAddOperation);
+                }
+            }
+
+            Toast.makeText(getSherlockActivity(), msg, Toast.LENGTH_SHORT).show();
+
+            if (mainActivity.tmp_oper_id != 0) {
+                mainActivity.tmp_oper_id = 0;
             }
 
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            if (mainActivity.tmp_oper_id != 0) {
+                try {
+                    final OperationEntity operation = dbHelper.getOperationDAO().queryForId(mainActivity.tmp_oper_id);
+
+                    etDate.setText(dateFormatter.format(operation.getDate()));
+                    etCost.setText(String.valueOf(operation.getCost()));
+                    etCount.setText(String.valueOf(operation.getCount()));
+                    etComment.setText(String.valueOf(operation.getComment()));
+
+                    for (int index = 0, count = adapterDestination.getCount(); index < count; ++index)
+                    {
+                        if (adapterDestination.getItem(index).getId() == operation.getDestination().getId()) {
+                            final int finalIndex = index;
+                            new Handler().postDelayed(new Runnable()
+                            {
+
+                                public void run()
+                                {
+                                    if (operation.getType().equals("in")) {
+                                        spinType.setSelection(1);
+                                    } else if (operation.getType().equals("out")) {
+                                        spinType.setSelection(0);
+                                    }
+                                }
+                            }, 100);
+                            new Handler().postDelayed(new Runnable()
+                            {
+
+                                public void run()
+                                {
+                                    spinDestination.setSelection(finalIndex, false);
+                                }
+                            }, 300);
+                            break;
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

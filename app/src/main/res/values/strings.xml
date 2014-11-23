@@ -60,5 +60,6 @@
     <string name="msgSuccessRemoveOperation">Операция успешно удалена</string>
 
     <string name="msgErrorAddOperation">Ошибка при добавлении операции. Повторите пожалуйста попытку</string>
+    <string name="msgErrorUpdateOperation">Ошибка при обновлении операции. Повторите пожалуйста попытку</string>
 
 </resources>

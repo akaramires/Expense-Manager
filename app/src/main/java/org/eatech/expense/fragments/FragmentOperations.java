@@ -5,6 +5,7 @@
 
 package org.eatech.expense.fragments;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,12 +19,14 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 import org.eatech.expense.HelperDate;
+import org.eatech.expense.MainActivity;
 import org.eatech.expense.R;
 import org.eatech.expense.adapter.OperationAdapter;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
@@ -65,11 +68,11 @@ public class FragmentOperations extends SherlockListFragment
     private OperationDao          operationDao;
     private OperationAdapter      operationAdapter;
     private SimpleDateFormat      dateFormatter;
-    private Calendar              current;
     private RangeDatePickerDialog dialogDatePickerEnd;
     private RangeDatePickerDialog dialogDatePickerStart;
     private Calendar              date_start;
     private Calendar              date_end;
+    private MainActivity          mainActivity;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -87,7 +90,6 @@ public class FragmentOperations extends SherlockListFragment
     {
         try {
             dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
-            current = Calendar.getInstance();
 
             initDateFilter();
             initVars();
@@ -125,6 +127,13 @@ public class FragmentOperations extends SherlockListFragment
     }
 
     @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        mainActivity = (MainActivity) activity;
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
     {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -140,11 +149,14 @@ public class FragmentOperations extends SherlockListFragment
 
         switch (item.getItemId()) {
             case R.id.action_edit:
+                mainActivity.tmp_oper_id = operationEntity.getId();
+                mainActivity.mViewPager.setCurrentItem(0);
                 return true;
             case R.id.action_delete:
                 try {
                     operationDao.delete(operationEntity);
                     setAdapter();
+                    Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveOperation), Toast.LENGTH_SHORT).show();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

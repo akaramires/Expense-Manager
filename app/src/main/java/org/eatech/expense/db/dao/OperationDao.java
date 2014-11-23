@@ -40,6 +40,13 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         return this.create(operationEntity);
     }
 
+    public int updateOperation(OperationEntity operationEntity) throws SQLException
+    {
+        Log.i(TAG, "updateOperation(" + operationEntity.toString() + ")");
+
+        return this.update(operationEntity);
+    }
+
     public Where<OperationEntity, Integer> getAllByPeriodBuilder(long date_start,
                                                                  long date_end) throws SQLException
     {

@@ -14,9 +14,11 @@ import butterknife.InjectView;
 public class MainActivity extends SherlockFragmentActivity
 {
     @InjectView(R.id.pager)
-    ViewPager mViewPager;
+    public ViewPager mViewPager;
 
     PagerAdapter mDemoCollectionPagerAdapter;
+
+    public int tmp_oper_id = 0;
 
     public void onCreate(Bundle savedInstanceState)
     {

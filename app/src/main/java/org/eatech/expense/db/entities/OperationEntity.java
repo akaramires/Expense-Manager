@@ -194,7 +194,7 @@ public class OperationEntity
 
     public static String pos2type(int position) {
         if (position == 1) {
-            return "int";
+            return "in";
         }
 
         return "out";
