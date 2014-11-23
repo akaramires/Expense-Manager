@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 
@@ -22,6 +23,9 @@ import org.eatech.expense.db.dao.OperationDao;
 import org.eatech.expense.db.entities.OperationEntity;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -33,6 +37,15 @@ public class FragmentOperations extends SherlockListFragment
 
     @InjectView(android.R.id.list)
     ListView listView;
+
+    @InjectView(R.id.tvMonth)
+    TextView tvMonth;
+
+    @InjectView(R.id.tvIn)
+    TextView tvIn;
+
+    @InjectView(R.id.tvOut)
+    TextView tvOut;
 
     private DatabaseHelper   dbHelper;
     private OperationDao     operationDao;
@@ -53,9 +66,7 @@ public class FragmentOperations extends SherlockListFragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         try {
-            dbHelper = HelperFactory.getInstance().getHelper();
-            operationDao = dbHelper.getOperationDAO();
-            operationAdapter = new OperationAdapter(getSherlockActivity());
+            setVars();
 
             List<OperationEntity> operations = operationDao.getCurrentMonth();
             Log.i(TAG, "operations count=" + operations.size());
@@ -64,6 +75,9 @@ public class FragmentOperations extends SherlockListFragment
             }
 
             listView.setAdapter(operationAdapter);
+
+            GregorianCalendar gCal = new GregorianCalendar();
+            tvMonth.setText(android.text.format.DateFormat.format("MMMM", gCal));
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,8 +97,24 @@ public class FragmentOperations extends SherlockListFragment
         }
     }
 
+    private void setVars() throws SQLException
+    {
+        if (dbHelper == null) {
+            dbHelper = HelperFactory.getInstance().getHelper();
+        }
+
+        if (operationDao == null) {
+            operationDao = dbHelper.getOperationDAO();
+        }
+        if (operationAdapter == null) {
+            operationAdapter = new OperationAdapter(getSherlockActivity());
+        }
+    }
+
     private void setAdapter() throws SQLException
     {
+        setVars();
+
         if (!operationAdapter.isEmpty()) {
             operationAdapter.clear();
         }
@@ -95,5 +125,8 @@ public class FragmentOperations extends SherlockListFragment
             operationAdapter.add(operationEntity);
         }
         operationAdapter.notifyDataSetChanged();
+
+        tvIn.setText("+" + operationDao.getInAtCurMonth());
+        tvOut.setText("-" + operationDao.getOutAtCurMonth());
     }
 }

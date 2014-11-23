@@ -73,7 +73,7 @@ public class OperationAdapter extends ArrayAdapter<OperationEntity>
                     holder.tvSum.setText("-" + String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
                     break;
                 case 1:
-                    holder.tvSum.setTextColor(Color.parseColor("blue"));
+                    holder.tvSum.setTextColor(context.getResources().getColor(R.color.blue));
                     holder.tvSum.setText(String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
                     break;
             }
