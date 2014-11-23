@@ -7,9 +7,12 @@ package org.eatech.expense.fragments;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,8 +26,6 @@ import org.eatech.expense.db.dao.OperationDao;
 import org.eatech.expense.db.entities.OperationEntity;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -94,6 +95,35 @@ public class FragmentOperations extends SherlockListFragment
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedState)
+    {
+        registerForContextMenu(listView);
+        super.onActivityCreated(savedState);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getSherlockActivity().getMenuInflater();
+        inflater.inflate(R.menu.listview_actions, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item)
+    {
+        AdapterView.AdapterContextMenuInfo source = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        OperationEntity operationEntity = operationAdapter.getItem(source.position);
+
+        switch (item.getItemId()) {
+            case R.id.action_edit:
+                return true;
+            default:
+                return super.onContextItemSelected(item);
         }
     }
 
