@@ -8,11 +8,9 @@ package org.eatech.expense.db.dao;
 import android.util.Log;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
-import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.support.ConnectionSource;
 
-import org.eatech.expense.HelperDate;
 import org.eatech.expense.db.entities.OperationEntity;
 
 import java.sql.SQLException;
@@ -69,7 +67,7 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         Log.i(TAG, "getInByPeriod()");
 
         List<OperationEntity> oprtns = this.getAllByPeriodBuilder(date_start, date_end)
-            .and().eq(OperationEntity.COL_TYPE_ID, 1)
+            .and().eq(OperationEntity.COL_TYPE, "in")
             .query();
 
         double in = 0;
@@ -85,7 +83,7 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         Log.i(TAG, "getOutByPeriod()");
 
         List<OperationEntity> oprtns = this.getAllByPeriodBuilder(date_start, date_end)
-            .and().eq(OperationEntity.COL_TYPE_ID, 0)
+            .and().eq(OperationEntity.COL_TYPE, "out")
             .query();
 
         double in = 0;

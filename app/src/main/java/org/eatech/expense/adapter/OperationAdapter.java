@@ -67,15 +67,12 @@ public class OperationAdapter extends ArrayAdapter<OperationEntity>
             String dateMonth = dfMonth.format(new Date(operationEntity.getDate()));
             holder.tvDateMonth.setText(dateMonth);
 
-            switch (operationEntity.getType_id()) {
-                case 0:
-                    holder.tvSum.setTextColor(Color.parseColor("red"));
-                    holder.tvSum.setText("-" + String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
-                    break;
-                case 1:
-                    holder.tvSum.setTextColor(context.getResources().getColor(R.color.blue));
-                    holder.tvSum.setText(String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
-                    break;
+            if (operationEntity.getType().equals("out")) {
+                holder.tvSum.setTextColor(Color.parseColor("red"));
+                holder.tvSum.setText("-" + String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
+            } else if (operationEntity.getType().equals("in")) {
+                holder.tvSum.setTextColor(context.getResources().getColor(R.color.blue));
+                holder.tvSum.setText(String.valueOf(operationEntity.getCost() * operationEntity.getCount()));
             }
 
         } catch (SQLException e) {

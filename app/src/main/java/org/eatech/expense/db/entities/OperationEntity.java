@@ -20,7 +20,7 @@ public class OperationEntity
     public final static String TABLE_NAME = "operations";
 
     public final static String COL_DATE           = "date";
-    public final static String COL_TYPE_ID        = "type_id";
+    public final static String COL_TYPE           = "type";
     public final static String COL_SOURCE_ID      = "source_id";
     public final static String COL_DESTINATION_ID = "destination_id";
     public final static String COL_COUNT          = "count";
@@ -34,8 +34,8 @@ public class OperationEntity
     @DatabaseField(canBeNull = false, dataType = DataType.LONG, columnName = COL_DATE)
     private long date;
 
-    @DatabaseField(canBeNull = false, dataType = DataType.INTEGER, columnName = COL_TYPE_ID)
-    private int type_id;
+    @DatabaseField(canBeNull = false, dataType = DataType.STRING, columnName = COL_TYPE)
+    private String type;
 
     @DatabaseField(foreign = true, columnName = COL_SOURCE_ID)
     private SourceEntity source;
@@ -59,11 +59,11 @@ public class OperationEntity
     {
     }
 
-    public OperationEntity(long date, int type_id, SourceEntity source,
+    public OperationEntity(long date, String type, SourceEntity source,
                            DestinationEntity destination, int count, double cost, String comment)
     {
         this.date = date;
-        this.type_id = type_id;
+        this.type = type;
         this.source = source;
         this.destination = destination;
         this.count = count;
@@ -72,12 +72,12 @@ public class OperationEntity
         this.setCreated_at();
     }
 
-    public OperationEntity(int id, long date, int type_id, SourceEntity source,
+    public OperationEntity(int id, long date, String type, SourceEntity source,
                            DestinationEntity destination, int count, double cost, String comment)
     {
         Id = id;
         this.date = date;
-        this.type_id = type_id;
+        this.type = type;
         this.source = source;
         this.destination = destination;
         this.count = count;
@@ -106,14 +106,14 @@ public class OperationEntity
         this.date = date;
     }
 
-    public int getType_id()
+    public String getType()
     {
-        return type_id;
+        return type;
     }
 
-    public void setType_id(int type_id)
+    public void setType(String type)
     {
-        this.type_id = type_id;
+        this.type = type;
     }
 
     public SourceEntity getSource() throws SQLException
@@ -182,7 +182,7 @@ public class OperationEntity
         return "OperationEntity{" +
             "Id=" + Id +
             ", date=" + date +
-            ", type_id=" + type_id +
+            ", type=" + type +
             ", source_id=" + source.getId() +
             ", destination_id=" + destination.getId() +
             ", count=" + count +
@@ -190,5 +190,13 @@ public class OperationEntity
             ", comment=" + comment +
             ", created_at=" + created_at +
             '}';
+    }
+
+    public static String pos2type(int position) {
+        if (position == 1) {
+            return "int";
+        }
+
+        return "out";
     }
 }

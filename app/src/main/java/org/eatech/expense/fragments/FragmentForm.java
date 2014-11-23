@@ -79,19 +79,19 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     EditText etDate;
 
     @InjectView(R.id.spinSource)
-//    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
-    Spinner spinSource;
+    //    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
+        Spinner spinSource;
 
     @InjectView(R.id.spinDestination)
-    @Select(order = 2, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
+    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
     Spinner spinDestination;
 
     @InjectView(R.id.etCount)
-    @NumberRule(order = 3, type = NumberRule.NumberType.INTEGER, gt = 0.99, messageResId = R.string.msgValidationCount)
+    @NumberRule(order = 2, type = NumberRule.NumberType.INTEGER, gt = 0.99, messageResId = R.string.msgValidationCount)
     EditText etCount;
 
     @InjectView(R.id.etCost)
-    @NumberRule(order = 4, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
+    @NumberRule(order = 3, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
     EditText etCost;
 
     @InjectView(R.id.outTotal)
@@ -445,21 +445,21 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     public void onValidationSucceeded()
     {
         try {
-            int type_position = spinType.getSelectedItemPosition();
+            int type = spinType.getSelectedItemPosition();
 
             Date d = new SimpleDateFormat("dd-MM-yyyy").parse(etDate.getText().toString());
             long date = d.getTime();
 
             // SourceEntity source = adapterSource.getItem(spinSource.getSelectedItemPosition());
             SourceEntity source = dbHelper.getSourceDAO().queryForId(1);
+
             DestinationEntity destination = adapterDestination.getItem(spinDestination.getSelectedItemPosition());
 
             int count = Integer.parseInt(etCount.getText().toString());
             double cost = Double.parseDouble(etCost.getText().toString());
             String comment = etComment.getText().toString();
 
-            OperationEntity operationEntity = new OperationEntity(date, type_position, source,
-                destination, count, cost, comment);
+            OperationEntity operationEntity = new OperationEntity(date, OperationEntity.pos2type(type), source, destination, count, cost, comment);
 
             int created = dbHelper.getOperationDAO().createOperation(operationEntity);
             if (created > 0) {

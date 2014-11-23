@@ -33,7 +33,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
     private static final String TAG = "Expense-" + DatabaseHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME    = "expense.sqlite";
-    private static final int    DATABASE_VERSION = 6;
+    private static final int    DATABASE_VERSION = 7;
     private CurrencyDao    currencyDao;
     private SourceDao      sourceDao;
     private CategoryDao    categoryDao;
@@ -79,11 +79,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
             database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` " +
                 "(`title`,    `category_id`, `type`, `editable`, `created_at`) VALUES " +
                 "('Бензин',   1,             'out',   0,         '" + curDate + "')," +
-                "('Масло',    1,             'out',   0,         '" + curDate + "')," +
+                "('Хлеб',     2,             'out',   0,         '" + curDate + "')," +
+                "('Молоко',   2,             'out',   0,         '" + curDate + "')," +
+                "('Сахар',    2,             'out',   0,         '" + curDate + "')," +
                 "('Зарплата', 3,             'in',    0,         '" + curDate + "')" +
                 ";");
 
             TableUtils.createTable(connectionSource, OperationEntity.class);
+            database.execSQL("INSERT INTO `" + OperationEntity.TABLE_NAME + "` " +
+                "(`date`,            `type`, `source_id`, `destination_id`, `count`, `cost`,  `comment`, `created_at`) VALUES " +
+                "('" + curDate + "', 'out',   1,           1,                20,     '39',     '',       '" + curDate + "')," +
+                "('" + curDate + "', 'out',   1,           2,                3,      '10',     '',       '" + curDate + "')," +
+                "('" + curDate + "', 'out',   1,           3,                2,      '30.15',  '',       '" + curDate + "')," +
+                "('" + curDate + "', 'out',   1,           4,                1,      '41.44',  '',       '" + curDate + "')," +
+                "('" + curDate + "', 'in',    1,           5,                1,      '25000',  '',       '" + curDate + "')" +
+                ";");
+
         } catch (SQLException e) {
             Log.e(TAG, "Error creating DB " + DATABASE_NAME);
             e.printStackTrace();
