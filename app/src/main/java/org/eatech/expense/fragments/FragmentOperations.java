@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,10 +31,12 @@ import org.eatech.expense.MainActivity;
 import org.eatech.expense.R;
 import org.eatech.expense.adapter.OperationAdapter;
 import org.eatech.expense.adapter.RangeDatePickerDialog;
+import org.eatech.expense.adapter.SourceAdapter;
 import org.eatech.expense.db.DatabaseHelper;
 import org.eatech.expense.db.HelperFactory;
 import org.eatech.expense.db.dao.OperationDao;
 import org.eatech.expense.db.entities.OperationEntity;
+import org.eatech.expense.db.entities.SourceEntity;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -45,7 +48,8 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class FragmentOperations extends SherlockListFragment
+public class FragmentOperations extends SherlockListFragment implements
+                                                             AdapterView.OnItemSelectedListener
 {
     private static final String TAG = "Expense-" + FragmentOperations.class.getSimpleName();
 
@@ -64,15 +68,19 @@ public class FragmentOperations extends SherlockListFragment
     @InjectView(R.id.etEnd)
     EditText etEnd;
 
-    private DatabaseHelper        dbHelper;
-    private OperationDao          operationDao;
-    private OperationAdapter      operationAdapter;
-    private SimpleDateFormat      dateFormatter;
-    private RangeDatePickerDialog dialogDatePickerEnd;
-    private RangeDatePickerDialog dialogDatePickerStart;
-    private Calendar              date_start;
-    private Calendar              date_end;
-    private MainActivity          mainActivity;
+    @InjectView(R.id.spinSource)
+    Spinner spinSource;
+
+    private DatabaseHelper              dbHelper;
+    private OperationDao                operationDao;
+    private OperationAdapter            operationAdapter;
+    private SimpleDateFormat            dateFormatter;
+    private RangeDatePickerDialog       dialogDatePickerEnd;
+    private RangeDatePickerDialog       dialogDatePickerStart;
+    private Calendar                    date_start;
+    private Calendar                    date_end;
+    private MainActivity                mainActivity;
+    private SourceAdapter<SourceEntity> adapterSource;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -93,14 +101,16 @@ public class FragmentOperations extends SherlockListFragment
 
             initDateFilter();
             initVars();
+            initAdapterSource();
 
-            List<OperationEntity> operations = operationDao.getAllByPeriod(date_start.getTimeInMillis(), date_end.getTimeInMillis());
+            List<OperationEntity> operations = operationDao.getAllByPeriod(getSource().getId(), date_start.getTimeInMillis(), date_end.getTimeInMillis());
             Log.i(TAG, "operations count=" + operations.size());
             for (OperationEntity operationEntity : operations) {
                 operationAdapter.add(operationEntity);
             }
 
             listView.setAdapter(operationAdapter);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -112,6 +122,7 @@ public class FragmentOperations extends SherlockListFragment
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
             try {
+                initAdapterSource();
                 setAdapter();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -188,10 +199,10 @@ public class FragmentOperations extends SherlockListFragment
             operationAdapter.clear();
         }
 
-        tvIn.setText("+" + operationDao.getInByPeriod(date_start.getTimeInMillis(), date_end.getTimeInMillis()));
-        tvOut.setText("-" + operationDao.getOutByPeriod(date_start.getTimeInMillis(), date_end.getTimeInMillis()));
+        tvIn.setText("+ " + getSource().getCurrency().getSymbol_left() + operationDao.getInByPeriod(getSource().getId(), date_start.getTimeInMillis(), date_end.getTimeInMillis()) + getSource().getCurrency().getSymbol_right());
+        tvOut.setText("- " + getSource().getCurrency().getSymbol_left() + operationDao.getOutByPeriod(getSource().getId(), date_start.getTimeInMillis(), date_end.getTimeInMillis()) + getSource().getCurrency().getSymbol_right());
 
-        List<OperationEntity> operations = operationDao.getAllByPeriod(date_start.getTimeInMillis(), date_end.getTimeInMillis());
+        List<OperationEntity> operations = operationDao.getAllByPeriod(getSource().getId(), date_start.getTimeInMillis(), date_end.getTimeInMillis());
         Log.i(TAG, "operations count=" + operations.size());
         for (OperationEntity operationEntity : operations) {
             operationAdapter.add(operationEntity);
@@ -273,5 +284,40 @@ public class FragmentOperations extends SherlockListFragment
                 dialogDatePickerEnd.show();
                 break;
         }
+    }
+
+    private void initAdapterSource() throws SQLException
+    {
+        adapterSource = new SourceAdapter<SourceEntity>(getSherlockActivity());
+        adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+
+        List<SourceEntity> sourceEntityList = dbHelper.getSourceDAO().getAll();
+        for (SourceEntity srcEntity : sourceEntityList) {
+            adapterSource.add(srcEntity);
+        }
+
+        spinSource.setAdapter(adapterSource);
+        spinSource.setSelection(0);
+        spinSource.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+    {
+        try {
+            setAdapter();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView)
+    {
+    }
+
+    private SourceEntity getSource()
+    {
+        return adapterSource.getItem(spinSource.getSelectedItemPosition());
     }
 }

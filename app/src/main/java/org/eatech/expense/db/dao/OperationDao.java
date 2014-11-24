@@ -59,21 +59,23 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
             .le(OperationEntity.COL_DATE, date_end);
     }
 
-    public List<OperationEntity> getAllByPeriod(long date_start, long date_end) throws SQLException
+    public List<OperationEntity> getAllByPeriod(int source_id, long date_start,
+                                                long date_end) throws SQLException
     {
         Log.i(TAG, "getAllByPeriod()");
 
         return this.getAllByPeriodBuilder(date_start, date_end)
-            .and()
-            .le(OperationEntity.COL_DATE, date_end)
+            .and().eq(OperationEntity.COL_SOURCE_ID, source_id)
+            .and().le(OperationEntity.COL_DATE, date_end)
             .query();
     }
 
-    public double getInByPeriod(long date_start, long date_end) throws SQLException
+    public double getInByPeriod(int source_id, long date_start, long date_end) throws SQLException
     {
         Log.i(TAG, "getInByPeriod()");
 
         List<OperationEntity> oprtns = this.getAllByPeriodBuilder(date_start, date_end)
+            .and().eq(OperationEntity.COL_SOURCE_ID, source_id)
             .and().eq(OperationEntity.COL_TYPE, "in")
             .query();
 
@@ -85,11 +87,12 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
         return in;
     }
 
-    public double getOutByPeriod(long date_start, long date_end) throws SQLException
+    public double getOutByPeriod(int source_id, long date_start, long date_end) throws SQLException
     {
         Log.i(TAG, "getOutByPeriod()");
 
         List<OperationEntity> oprtns = this.getAllByPeriodBuilder(date_start, date_end)
+            .and().eq(OperationEntity.COL_SOURCE_ID, source_id)
             .and().eq(OperationEntity.COL_TYPE, "out")
             .query();
 

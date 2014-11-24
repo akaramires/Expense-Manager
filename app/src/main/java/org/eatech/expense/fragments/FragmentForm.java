@@ -461,8 +461,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
             Date d = new SimpleDateFormat("dd-MM-yyyy").parse(etDate.getText().toString());
             long date = d.getTime();
 
-            // SourceEntity source = adapterSource.getItem(spinSource.getSelectedItemPosition());
-            SourceEntity source = dbHelper.getSourceDAO().queryForId(1);
+            SourceEntity source = adapterSource.getItem(spinSource.getSelectedItemPosition());
 
             DestinationEntity destination = adapterDestination.getItem(spinDestination.getSelectedItemPosition());
 
