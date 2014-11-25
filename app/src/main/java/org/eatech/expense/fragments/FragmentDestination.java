@@ -106,7 +106,7 @@ public class FragmentDestination extends SherlockFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, com.actionbarsherlock.view.MenuInflater inflater)
     {
-        inflater.inflate(R.menu.menu_source_list_add, menu);
+        inflater.inflate(R.menu.menu_destination, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -115,6 +115,8 @@ public class FragmentDestination extends SherlockFragment implements
     {
         switch (item.getItemId()) {
             case R.id.action_add:
+                break;
+            case R.id.action_add_category:
                 break;
         }
 

@@ -1,9 +1,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:paddingTop="10dp"
-              android:paddingBottom="10dp"
               android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/out"
+        android:layout_width="3dp"
+        android:layout_height="match_parent"
+        android:background="@color/red"
+        android:visibility="gone"
+        android:orientation="vertical"/>
+
+    <LinearLayout
+        android:id="@+id/in"
+        android:layout_width="3dp"
+        android:layout_height="match_parent"
+        android:background="@color/blue"
+        android:visibility="gone"
+        android:orientation="vertical"/>
 
     <LinearLayout
         android:layout_width="0dip"
@@ -11,8 +25,8 @@
         android:layout_weight="1"
         android:paddingLeft="30dp"
         android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
         android:orientation="horizontal">
 
         <TextView

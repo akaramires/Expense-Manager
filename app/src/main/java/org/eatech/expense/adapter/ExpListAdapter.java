@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.eatech.expense.R;
@@ -92,13 +93,26 @@ public class ExpListAdapter extends BaseExpandableListAdapter
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent)
     {
+        DestinationEntity child = getChild(groupPosition, childPosition);
+
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.explistview_child_view, null);
         }
 
         TextView textChild = (TextView) convertView.findViewById(R.id.childTitle);
-        textChild.setText(getChild(groupPosition, childPosition).getTitle());
+        LinearLayout in = (LinearLayout) convertView.findViewById(R.id.in);
+        LinearLayout out = (LinearLayout) convertView.findViewById(R.id.out);
+
+        textChild.setText(child.getTitle());
+
+        if (child.getType().equals("in")) {
+            in.setVisibility(View.VISIBLE);
+            out.setVisibility(View.GONE);
+        } else if (child.getType().equals("out")) {
+            in.setVisibility(View.GONE);
+            out.setVisibility(View.VISIBLE);
+        }
 
         return convertView;
     }
