@@ -16,6 +16,7 @@
     <string name="screen_source">Источник</string>
     <string name="screen_source_new">Новый источник</string>
     <string name="screen_sources">Источники</string>
+    <string name="screen_destionations">Назначения</string>
 
     <string name="lblType">Тип</string>
     <string-array name="lblTypes">

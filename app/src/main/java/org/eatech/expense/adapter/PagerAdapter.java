@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import org.eatech.expense.fragments.FragmentBudgets;
+import org.eatech.expense.fragments.FragmentDestination;
 import org.eatech.expense.fragments.FragmentForm;
 import org.eatech.expense.fragments.FragmentOperations;
 import org.eatech.expense.fragments.FragmentSource;
@@ -25,9 +26,10 @@ public class PagerAdapter extends FragmentStatePagerAdapter
     {
         super(fm);
         titles = new String[] {
+            context.getString(R.string.screen_sources),
+            context.getString(R.string.screen_destionations),
             context.getString(R.string.action_add),
             context.getString(R.string.screen_operations),
-            context.getString(R.string.screen_orders),
             context.getString(R.string.screen_budgets),
             context.getString(R.string.screen_reports)
         };
@@ -39,18 +41,21 @@ public class PagerAdapter extends FragmentStatePagerAdapter
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new FragmentForm();
-                break;
-            case 1:
-                fragment = new FragmentOperations();
-                break;
-            case 2:
                 fragment = new FragmentSource();
                 break;
+            case 1:
+                fragment = new FragmentDestination();
+                break;
+            case 2:
+                fragment = new FragmentForm();
+                break;
             case 3:
-                fragment = new FragmentBudgets();
+                fragment = new FragmentOperations();
                 break;
             case 4:
+                fragment = new FragmentBudgets();
+                break;
+            case 5:
                 fragment = new FragmentReports();
                 break;
         }
