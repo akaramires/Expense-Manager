@@ -27,7 +27,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter
         super(fm);
         titles = new String[] {
             context.getString(R.string.screen_sources),
-            context.getString(R.string.screen_destionations),
+            context.getString(R.string.screen_destinations),
             context.getString(R.string.action_add),
             context.getString(R.string.screen_operations),
             context.getString(R.string.screen_budgets),

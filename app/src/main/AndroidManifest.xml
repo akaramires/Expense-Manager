@@ -31,6 +31,10 @@
             android:name=".CategoryFormActivity"
             android:label="@string/screen_category_new">
         </activity>
+        <activity
+            android:name=".DestinationFormActivity"
+            android:label="@string/screen_destination_new">
+        </activity>
     </application>
 
 </manifest>

@@ -16,8 +16,9 @@
     <string name="screen_source">Источник</string>
     <string name="screen_source_new">Новый источник</string>
     <string name="screen_sources">Источники</string>
-    <string name="screen_destionations">Назначения</string>
+    <string name="screen_destinations">Назначения</string>
     <string name="screen_category_new">Новая категория</string>
+    <string name="screen_destination_new">Новое категория</string>
 
     <string name="lblType">Тип</string>
     <string-array name="lblTypes">
@@ -57,6 +58,10 @@
     <string name="msgSuccessAddSource">Источник успешно добавлен</string>
     <string name="msgSuccessUpdateSource">Источник успешно обновлен</string>
     <string name="msgSuccessRemoveSource">Источник успешно удален</string>
+
+    <string name="msgSuccessAddDestination">Назначение успешно добавлено</string>
+    <string name="msgSuccessUpdateDestination">Назначение успешно обновлено</string>
+    <string name="msgSuccessRemoveDestination">Назначение успешно удалено</string>
 
     <string name="msgSuccessAddCategory">Категория успешно добавлена</string>
     <string name="msgSuccessUpdateCategory">Источник успешно обновлена</string>

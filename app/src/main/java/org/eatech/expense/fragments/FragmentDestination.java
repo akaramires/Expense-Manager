@@ -20,6 +20,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
 import org.eatech.expense.CategoryFormActivity;
+import org.eatech.expense.DestinationFormActivity;
 import org.eatech.expense.MainActivity;
 import org.eatech.expense.R;
 import org.eatech.expense.SourceFormActivity;
@@ -139,13 +140,17 @@ public class FragmentDestination extends SherlockFragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.action_add:
-                Intent intent = new Intent(getSherlockActivity(), CategoryFormActivity.class);
+                intent = new Intent(getSherlockActivity(), DestinationFormActivity.class);
                 intent.putExtra("isEdit", 0);
                 startActivityForResult(intent, 1);
                 break;
             case R.id.action_add_category:
+                intent = new Intent(getSherlockActivity(), CategoryFormActivity.class);
+                intent.putExtra("isEdit", 0);
+                startActivityForResult(intent, 1);
                 break;
         }
 
