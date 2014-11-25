@@ -110,6 +110,7 @@ public class FragmentOperations extends SherlockListFragment implements
             }
 
             listView.setAdapter(operationAdapter);
+            registerForContextMenu(listView);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -133,7 +134,6 @@ public class FragmentOperations extends SherlockListFragment implements
     @Override
     public void onActivityCreated(Bundle savedState)
     {
-        registerForContextMenu(listView);
         super.onActivityCreated(savedState);
     }
 
@@ -147,6 +147,7 @@ public class FragmentOperations extends SherlockListFragment implements
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo)
     {
+        menu.clear();
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getSherlockActivity().getMenuInflater();
         inflater.inflate(R.menu.listview_actions, menu);
@@ -155,8 +156,8 @@ public class FragmentOperations extends SherlockListFragment implements
     @Override
     public boolean onContextItemSelected(android.view.MenuItem item)
     {
-        AdapterView.AdapterContextMenuInfo source = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        OperationEntity operationEntity = operationAdapter.getItem(source.position);
+        AdapterView.AdapterContextMenuInfo operation = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        OperationEntity operationEntity = operationAdapter.getItem(operation.position);
 
         switch (item.getItemId()) {
             case R.id.action_edit:

@@ -13,7 +13,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import org.eatech.expense.fragments.FragmentBudgets;
 import org.eatech.expense.fragments.FragmentForm;
 import org.eatech.expense.fragments.FragmentOperations;
-import org.eatech.expense.fragments.FragmentOrders;
+import org.eatech.expense.fragments.FragmentSource;
 import org.eatech.expense.fragments.FragmentReports;
 import org.eatech.expense.R;
 
@@ -45,7 +45,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter
                 fragment = new FragmentOperations();
                 break;
             case 2:
-                fragment = new FragmentOrders();
+                fragment = new FragmentSource();
                 break;
             case 3:
                 fragment = new FragmentBudgets();
