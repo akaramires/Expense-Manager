@@ -6,6 +6,7 @@
 package org.eatech.expense.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,8 +19,10 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
+import org.eatech.expense.CategoryFormActivity;
 import org.eatech.expense.MainActivity;
 import org.eatech.expense.R;
+import org.eatech.expense.SourceFormActivity;
 import org.eatech.expense.adapter.CategoryAdapter;
 import org.eatech.expense.adapter.CategoryDestionations;
 import org.eatech.expense.adapter.DestinationAdapter;
@@ -104,6 +107,29 @@ public class FragmentDestination extends SherlockFragment implements
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (data == null) {
+            return;
+        }
+
+        int status = data.getIntExtra("status", -1);
+        switch (status) {
+            case -1:
+                break;
+            case 0:
+                break;
+            case 1:
+                try {
+                    fillList();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, com.actionbarsherlock.view.MenuInflater inflater)
     {
         inflater.inflate(R.menu.menu_destination, menu);
@@ -115,6 +141,9 @@ public class FragmentDestination extends SherlockFragment implements
     {
         switch (item.getItemId()) {
             case R.id.action_add:
+                Intent intent = new Intent(getSherlockActivity(), CategoryFormActivity.class);
+                intent.putExtra("isEdit", 0);
+                startActivityForResult(intent, 1);
                 break;
             case R.id.action_add_category:
                 break;

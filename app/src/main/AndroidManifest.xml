@@ -25,7 +25,11 @@
         </activity>
         <activity
             android:name=".SourceFormActivity"
-            android:label="@string/action_add">
+            android:label="@string/screen_source_new">
+        </activity>
+        <activity
+            android:name=".CategoryFormActivity"
+            android:label="@string/screen_category_new">
         </activity>
     </application>
 
