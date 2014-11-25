@@ -115,6 +115,11 @@ public class CategoryEntity
     @Override
     public String toString()
     {
+        return title;
+    }
+
+    public String toStringFull()
+    {
         return "CategoryEntity{" +
             "Id=" + Id +
             ", title='" + title + '\'' +

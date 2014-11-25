@@ -54,6 +54,8 @@
     <string name="msgValidationTitle">Пожалуйста введите название</string>
     <string name="msgValidationSum">Пожалуйста введите начальную сумму</string>
     <string name="msgValidationRemoveLastSource">Вы не можете удалить последний источник</string>
+    <string name="msgValidationRemoveDefaultDestination">Вы не можете удалить стандарные назначения</string>
+    <string name="msgValidationRemoveDefaultCategory">Вы не можете удалить стандарные категории</string>
 
     <string name="msgSuccessAddSource">Источник успешно добавлен</string>
     <string name="msgSuccessUpdateSource">Источник успешно обновлен</string>
@@ -64,8 +66,8 @@
     <string name="msgSuccessRemoveDestination">Назначение успешно удалено</string>
 
     <string name="msgSuccessAddCategory">Категория успешно добавлена</string>
-    <string name="msgSuccessUpdateCategory">Источник успешно обновлена</string>
-    <string name="msgSuccessRemoveCategory">Источник успешно удалена</string>
+    <string name="msgSuccessUpdateCategory">Категория успешно обновлена</string>
+    <string name="msgSuccessRemoveCategory">Категория успешно удалена</string>
 
     <string name="msgSuccessAddOperation">Операция успешно добавлена</string>
     <string name="msgSuccessUpdateOperation">Операция успешно обновлена</string>

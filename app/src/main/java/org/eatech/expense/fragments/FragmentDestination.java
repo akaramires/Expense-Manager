@@ -6,6 +6,8 @@
 package org.eatech.expense.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -34,6 +37,7 @@ import org.eatech.expense.db.dao.CategoryDao;
 import org.eatech.expense.db.dao.DestinationDao;
 import org.eatech.expense.db.entities.CategoryEntity;
 import org.eatech.expense.db.entities.DestinationEntity;
+import org.eatech.expense.db.entities.SourceEntity;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -162,10 +166,20 @@ public class FragmentDestination extends SherlockFragment implements
         List<CategoryEntity> catsEntList = categoryDao.getAll();
         List<CategoryDestionations> categoryDestionationses = new ArrayList<CategoryDestionations>();
 
+        if (categoryAdapter.getCount() > 0) {
+            categoryAdapter.clear();
+        }
+
+        if (destinationAdapter.getCount() > 0) {
+            destinationAdapter.clear();
+        }
+
         for (CategoryEntity cat : catsEntList) {
             CategoryDestionations tmpCat = new CategoryDestionations(cat);
+            categoryAdapter.add(cat);
 
             for (DestinationEntity destination : cat.getDestinations()) {
+                destinationAdapter.add(destination);
                 tmpCat.addDestination(destination);
             }
 
@@ -193,6 +207,8 @@ public class FragmentDestination extends SherlockFragment implements
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id)
     {
+        final CharSequence[] items = { getString(R.string.action_edit), getString(R.string.action_delete) };
+
         int itemType = ExpandableListView.getPackedPositionType(id);
 
         int childPosition;
@@ -201,14 +217,82 @@ public class FragmentDestination extends SherlockFragment implements
             childPosition = ExpandableListView.getPackedPositionChild(id);
             groupPosition = ExpandableListView.getPackedPositionGroup(id);
 
-            Log.i(TAG, "groupPosition=" + groupPosition);
-            Log.i(TAG, "childPosition=" + childPosition);
+            Log.i(TAG, "groupPosition+" + groupPosition);
+            Log.i(TAG, "childPosition+" + childPosition);
+
+            final DestinationEntity destination = destinationAdapter.getItem(childPosition);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+            builder.setItems(items, new DialogInterface.OnClickListener()
+            {
+
+                public void onClick(DialogInterface dialog, int item)
+                {
+                    switch (item) {
+                        case 0:
+                            Intent intent = new Intent(getSherlockActivity(), DestinationFormActivity.class);
+                            intent.putExtra("isEdit", destination.getId());
+                            startActivityForResult(intent, 1);
+                            break;
+                        case 1:
+                            try {
+                                if (destination.getEditable() == 0) {
+                                    Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationRemoveDefaultDestination), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    destinationDao.delete(destination);
+
+                                    fillList();
+
+                                    Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveDestination), Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                    }
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
             return true;
 
         } else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
             groupPosition = ExpandableListView.getPackedPositionGroup(id);
 
-            Log.i(TAG, "groupPosition=" + groupPosition);
+            Log.i(TAG, "groupPosition+" + groupPosition);
+
+            final CategoryEntity category = categoryAdapter.getItem(groupPosition);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+            builder.setItems(items, new DialogInterface.OnClickListener()
+            {
+
+                public void onClick(DialogInterface dialog, int item)
+                {
+                    switch (item) {
+                        case 0:
+                            Intent intent = new Intent(getSherlockActivity(), CategoryFormActivity.class);
+                            intent.putExtra("isEdit", category.getId());
+                            startActivityForResult(intent, 1);
+                            break;
+                        case 1:
+                            try {
+                                if (category.getEditable() == 0) {
+                                    Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationRemoveDefaultCategory), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    categoryDao.delete(category);
+
+                                    fillList();
+
+                                    Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveCategory), Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                    }
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
             return true;
         } else {
 
