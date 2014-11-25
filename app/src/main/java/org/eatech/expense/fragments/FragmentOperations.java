@@ -6,7 +6,9 @@
 package org.eatech.expense.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -23,8 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 
 import org.eatech.expense.HelperDate;
 import org.eatech.expense.MainActivity;
@@ -49,12 +49,10 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class FragmentOperations extends SherlockListFragment implements
-                                                             AdapterView.OnItemSelectedListener
+                                                             AdapterView.OnItemSelectedListener,
+                                                             AdapterView.OnItemLongClickListener
 {
     private static final String TAG = "Expense-" + FragmentOperations.class.getSimpleName();
-
-    @InjectView(android.R.id.list)
-    ListView listView;
 
     @InjectView(R.id.tvIn)
     TextView tvIn;
@@ -89,7 +87,6 @@ public class FragmentOperations extends SherlockListFragment implements
         View rootView = inflater.inflate(R.layout.fragment_operations_list, container, false);
         ButterKnife.inject(this, rootView);
 
-        //        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -109,8 +106,8 @@ public class FragmentOperations extends SherlockListFragment implements
                 operationAdapter.add(operationEntity);
             }
 
-            listView.setAdapter(operationAdapter);
-            registerForContextMenu(listView);
+            getListView().setAdapter(operationAdapter);
+            getListView().setOnItemLongClickListener(this);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -211,25 +208,6 @@ public class FragmentOperations extends SherlockListFragment implements
         operationAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, com.actionbarsherlock.view.MenuInflater inflater)
-    {
-        inflater.inflate(R.menu.menu_calendar, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId()) {
-            case R.id.menuItemCancel:
-
-                break;
-        }
-
-        return true;
-    }
-
     private void initDateFilter()
     {
         date_start = HelperDate.getStartCurrentMonthCal();
@@ -320,5 +298,47 @@ public class FragmentOperations extends SherlockListFragment implements
     private SourceEntity getSource()
     {
         return adapterSource.getItem(spinSource.getSelectedItemPosition());
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l)
+    {
+        final OperationEntity operation = operationAdapter.getItem(position);
+        final CharSequence[] items = { getString(R.string.action_edit), getString(R.string.action_delete) };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
+        builder.setItems(items, new DialogInterface.OnClickListener()
+        {
+
+            public void onClick(DialogInterface dialog, int item)
+            {
+                switch (item) {
+                    case 0:
+                        mainActivity.tmp_oper_id = operation.getId();
+                        mainActivity.mViewPager.setCurrentItem(0);
+                        break;
+                    case 1:
+                        try {
+                            if (dbHelper.getSourceDAO().countOf() < 2) {
+                                Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationRemoveLastSource), Toast.LENGTH_SHORT).show();
+                            } else {
+                                try {
+                                    operationDao.delete(operation);
+                                    setAdapter();
+                                    Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveOperation), Toast.LENGTH_SHORT).show();
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+        return false;
     }
 }
