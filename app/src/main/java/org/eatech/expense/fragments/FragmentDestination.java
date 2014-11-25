@@ -7,9 +7,11 @@ package org.eatech.expense.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -36,7 +38,9 @@ import java.util.List;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class FragmentDestination extends SherlockFragment
+public class FragmentDestination extends SherlockFragment implements
+                                                          ExpandableListView.OnGroupClickListener,
+                                                          AdapterView.OnItemLongClickListener
 {
     private static final String TAG = "Expense-" + FragmentDestination.class.getSimpleName();
 
@@ -135,19 +139,44 @@ public class FragmentDestination extends SherlockFragment
         ExpListAdapter adapter = new ExpListAdapter(getSherlockActivity(), categoryDestionationses);
 
         elvDestinations.setAdapter(adapter);
-        elvDestinations.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener()
-        {
-
-            public boolean onGroupClick(ExpandableListView arg0, View itemView, int itemPosition,
-                                        long itemId)
-            {
-                elvDestinations.expandGroup(itemPosition);
-                return true;
-            }
-        });
-
+        elvDestinations.setOnGroupClickListener(this);
+        elvDestinations.setOnItemLongClickListener(this);
         for (int i = 0; i < adapter.getGroupCount(); i++) {
             elvDestinations.expandGroup(i);
+        }
+    }
+
+    @Override
+    public boolean onGroupClick(ExpandableListView expandableListView, View view, int position,
+                                long l)
+    {
+        elvDestinations.expandGroup(position);
+        return true;
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id)
+    {
+        int itemType = ExpandableListView.getPackedPositionType(id);
+
+        int childPosition;
+        int groupPosition;
+        if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            childPosition = ExpandableListView.getPackedPositionChild(id);
+            groupPosition = ExpandableListView.getPackedPositionGroup(id);
+
+            Log.i(TAG, "groupPosition=" + groupPosition);
+            Log.i(TAG, "childPosition=" + childPosition);
+            return true;
+
+        } else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            groupPosition = ExpandableListView.getPackedPositionGroup(id);
+
+            Log.i(TAG, "groupPosition=" + groupPosition);
+            return true;
+        } else {
+
+            return false;
         }
     }
 }
