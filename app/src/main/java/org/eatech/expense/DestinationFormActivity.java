@@ -195,8 +195,11 @@ public class DestinationFormActivity extends SherlockFragmentActivity implements
 
         try {
             if (edit_id > 0) {
-                //                destinationDao.update(new DestinationEntity(edit_id, title, sum, sum, currencyEntity));
-                Toast.makeText(this, getString(R.string.msgSuccessUpdateSource), Toast.LENGTH_SHORT).show();
+                DestinationEntity destination = destinationDao.queryForId(edit_id);
+                destination.setTitle(title);
+                destination.setCategory(category);
+                destinationDao.update(destination);
+                Toast.makeText(this, getString(R.string.msgSuccessUpdateDestination), Toast.LENGTH_SHORT).show();
             } else {
                 DestinationEntity destination = new DestinationEntity();
                 destination.setTitle(title);

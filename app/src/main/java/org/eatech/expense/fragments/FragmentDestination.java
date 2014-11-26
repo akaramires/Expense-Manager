@@ -211,29 +211,33 @@ public class FragmentDestination extends SherlockFragment implements
 
         int itemType = ExpandableListView.getPackedPositionType(id);
 
-        int childPosition;
+        final int childPosition;
         int groupPosition;
         if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            childPosition = ExpandableListView.getPackedPositionChild(id) + 1;
+            childPosition = ExpandableListView.getPackedPositionChild(id);
             groupPosition = ExpandableListView.getPackedPositionGroup(id);
 
             Log.i(TAG, "groupPosition+" + groupPosition);
             Log.i(TAG, "childPosition+" + childPosition);
 
-            final DestinationEntity destination = destinationAdapter.getItem(childPosition);
             AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
             builder.setItems(items, new DialogInterface.OnClickListener()
             {
+
+                DestinationEntity destination;
 
                 public void onClick(DialogInterface dialog, int item)
                 {
                     switch (item) {
                         case 0:
+                            destination = destinationAdapter.getItem(childPosition);
                             Intent intent = new Intent(getSherlockActivity(), DestinationFormActivity.class);
                             intent.putExtra("isEdit", destination.getId());
                             startActivityForResult(intent, 1);
                             break;
                         case 1:
+                            destination = destinationAdapter.getItem(childPosition);
+                            Log.i(TAG, destination.toStringFull());
                             try {
                                 if (destination.getEditable() == 0) {
                                     Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationRemoveDefaultDestination), Toast.LENGTH_SHORT).show();
