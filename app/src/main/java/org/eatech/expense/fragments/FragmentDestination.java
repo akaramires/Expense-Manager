@@ -61,6 +61,7 @@ public class FragmentDestination extends SherlockFragment implements
     private CategoryAdapter<CategoryEntity>       categoryAdapter;
     private DestinationAdapter<DestinationEntity> destinationAdapter;
     private MainActivity                          mainActivity;
+    private ArrayList<CategoryDestionations>      categoryDestionationses;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -164,7 +165,7 @@ public class FragmentDestination extends SherlockFragment implements
     private void fillList() throws SQLException
     {
         List<CategoryEntity> catsEntList = categoryDao.getAll();
-        List<CategoryDestionations> categoryDestionationses = new ArrayList<CategoryDestionations>();
+        categoryDestionationses = new ArrayList<CategoryDestionations>();
 
         if (categoryAdapter.getCount() > 0) {
             categoryAdapter.clear();
@@ -214,42 +215,43 @@ public class FragmentDestination extends SherlockFragment implements
         final int childPosition;
         int groupPosition;
         if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            childPosition = ExpandableListView.getPackedPositionChild(id);
             groupPosition = ExpandableListView.getPackedPositionGroup(id);
+            childPosition = ExpandableListView.getPackedPositionChild(id);
 
             Log.i(TAG, "groupPosition+" + groupPosition);
             Log.i(TAG, "childPosition+" + childPosition);
+
+            final DestinationEntity destination = categoryDestionationses.get(groupPosition).getDestinations().get(childPosition);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
             builder.setItems(items, new DialogInterface.OnClickListener()
             {
 
-                DestinationEntity destination;
-
                 public void onClick(DialogInterface dialog, int item)
                 {
                     switch (item) {
                         case 0:
-                            destination = destinationAdapter.getItem(childPosition);
-                            Intent intent = new Intent(getSherlockActivity(), DestinationFormActivity.class);
-                            intent.putExtra("isEdit", destination.getId());
-                            startActivityForResult(intent, 1);
+                            if (destination.getEditable() == 0) {
+                                Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationEditDefaultDestination), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Intent intent = new Intent(getSherlockActivity(), DestinationFormActivity.class);
+                                intent.putExtra("isEdit", destination.getId());
+                                startActivityForResult(intent, 1);
+                            }
                             break;
                         case 1:
-                            destination = destinationAdapter.getItem(childPosition);
-                            Log.i(TAG, destination.toStringFull());
-                            try {
-                                if (destination.getEditable() == 0) {
-                                    Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationRemoveDefaultDestination), Toast.LENGTH_SHORT).show();
-                                } else {
+                            if (destination.getEditable() == 0) {
+                                Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationRemoveDefaultDestination), Toast.LENGTH_SHORT).show();
+                            } else {
+                                try {
                                     destinationDao.delete(destination);
 
                                     fillList();
 
                                     Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveDestination), Toast.LENGTH_SHORT).show();
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (SQLException e) {
-                                e.printStackTrace();
                             }
                             break;
                     }
@@ -265,6 +267,7 @@ public class FragmentDestination extends SherlockFragment implements
             Log.i(TAG, "groupPosition+" + groupPosition);
 
             final CategoryEntity category = categoryAdapter.getItem(groupPosition);
+            
             AlertDialog.Builder builder = new AlertDialog.Builder(getSherlockActivity());
             builder.setItems(items, new DialogInterface.OnClickListener()
             {
@@ -273,9 +276,13 @@ public class FragmentDestination extends SherlockFragment implements
                 {
                     switch (item) {
                         case 0:
-                            Intent intent = new Intent(getSherlockActivity(), CategoryFormActivity.class);
-                            intent.putExtra("isEdit", category.getId());
-                            startActivityForResult(intent, 1);
+                            if (category.getEditable() == 0) {
+                                Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationEditDefaultCategory), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Intent intent = new Intent(getSherlockActivity(), CategoryFormActivity.class);
+                                intent.putExtra("isEdit", category.getId());
+                                startActivityForResult(intent, 1);
+                            }
                             break;
                         case 1:
                             try {

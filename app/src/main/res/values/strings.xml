@@ -53,9 +53,14 @@
     <string name="msgValidationCurrency">Пожалуйста выберите валюту</string>
     <string name="msgValidationTitle">Пожалуйста введите название</string>
     <string name="msgValidationSum">Пожалуйста введите начальную сумму</string>
+
     <string name="msgValidationRemoveLastSource">Вы не можете удалить последний источник</string>
+
     <string name="msgValidationRemoveDefaultDestination">Вы не можете удалить стандарные назначения</string>
+    <string name="msgValidationEditDefaultDestination">Вы не можете редактировать стандарные назначения</string>
+
     <string name="msgValidationRemoveDefaultCategory">Вы не можете удалить стандарные категории</string>
+    <string name="msgValidationEditDefaultCategory">Вы не можете редактировать стандарные категории</string>
 
     <string name="msgSuccessAddSource">Источник успешно добавлен</string>
     <string name="msgSuccessUpdateSource">Источник успешно обновлен</string>

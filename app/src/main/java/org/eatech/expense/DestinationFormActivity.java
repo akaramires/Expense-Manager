@@ -198,7 +198,10 @@ public class DestinationFormActivity extends SherlockFragmentActivity implements
                 DestinationEntity destination = destinationDao.queryForId(edit_id);
                 destination.setTitle(title);
                 destination.setCategory(category);
+                destination.setEditable();
+                destination.setType(current_type);
                 destinationDao.update(destination);
+
                 Toast.makeText(this, getString(R.string.msgSuccessUpdateDestination), Toast.LENGTH_SHORT).show();
             } else {
                 DestinationEntity destination = new DestinationEntity();
@@ -207,8 +210,8 @@ public class DestinationFormActivity extends SherlockFragmentActivity implements
                 destination.setEditable();
                 destination.setCreated_at();
                 destination.setType(current_type);
-
                 destinationDao.create(destination);
+                
                 Toast.makeText(this, getString(R.string.msgSuccessAddDestination), Toast.LENGTH_SHORT).show();
             }
 
