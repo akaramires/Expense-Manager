@@ -214,7 +214,7 @@ public class FragmentDestination extends SherlockFragment implements
         int childPosition;
         int groupPosition;
         if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            childPosition = ExpandableListView.getPackedPositionChild(id);
+            childPosition = ExpandableListView.getPackedPositionChild(id) + 1;
             groupPosition = ExpandableListView.getPackedPositionGroup(id);
 
             Log.i(TAG, "groupPosition+" + groupPosition);
