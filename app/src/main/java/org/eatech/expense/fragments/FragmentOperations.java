@@ -315,7 +315,7 @@ public class FragmentOperations extends SherlockListFragment implements
                 switch (item) {
                     case 0:
                         mainActivity.tmp_oper_id = operation.getId();
-                        mainActivity.mViewPager.setCurrentItem(0);
+                        mainActivity.mViewPager.setCurrentItem(2);
                         break;
                     case 1:
                         try {

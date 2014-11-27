@@ -468,12 +468,13 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
                 if (mainActivity.tmp_oper_id > 0) {
                     OperationEntity old_operation = dbHelper.getOperationDAO().queryForId(mainActivity.tmp_oper_id);
                     double old_sum = old_operation.getCount() * old_operation.getCost();
+                    double new_sum_to_update = Double.parseDouble(source.getSum_current()) + old_sum - (operationEntity.getCost() * operationEntity.getCount());
 
                     operationEntity.setId(mainActivity.tmp_oper_id);
 
                     if (dbHelper.getOperationDAO().updateOperation(operationEntity) > 0) {
 
-                        source.setSum_current(String.valueOf(Double.parseDouble(source.getSum_current()) + old_sum - new_source_sum));
+                        source.setSum_current(String.valueOf(new_sum_to_update));
                         dbHelper.getSourceDAO().update(source);
 
                         clearForm();
