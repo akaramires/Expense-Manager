@@ -522,6 +522,13 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
                     etCount.setText(String.valueOf(operation.getCount()));
                     etComment.setText(String.valueOf(operation.getComment()));
 
+                    for (int i = 0; i < adapterSource.getCount(); i++) {
+                        if (operation.getSource().getId() == adapterSource.getItem(i).getId()) {
+                            spinSource.setSelection(i);
+                            break;
+                        }
+                    }
+
                     for (int index = 0, count = adapterDestination.getCount(); index < count; ++index)
                     {
                         if (adapterDestination.getItem(index).getId() == operation.getDestination().getId()) {
