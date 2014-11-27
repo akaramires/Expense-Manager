@@ -82,19 +82,19 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
     EditText etDate;
 
     @InjectView(R.id.spinSource)
-    //    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
-        Spinner spinSource;
+    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationSource)
+    Spinner spinSource;
 
     @InjectView(R.id.spinDestination)
-    @Select(order = 1, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
+    @Select(order = 2, defaultSelection = 0, messageResId = R.string.msgValidationDestination)
     Spinner spinDestination;
 
     @InjectView(R.id.etCount)
-    @NumberRule(order = 2, type = NumberRule.NumberType.INTEGER, gt = 0.99, messageResId = R.string.msgValidationCount)
+    @NumberRule(order = 3, type = NumberRule.NumberType.INTEGER, gt = 0.99, messageResId = R.string.msgValidationCount)
     EditText etCount;
 
     @InjectView(R.id.etCost)
-    @NumberRule(order = 3, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
+    @NumberRule(order = 4, type = NumberRule.NumberType.DOUBLE, gt = 0.01, messageResId = R.string.msgValidationCost)
     EditText etCost;
 
     @InjectView(R.id.outTotal)
@@ -102,12 +102,6 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
     @InjectView(R.id.etComment)
     EditText etComment;
-
-    @InjectView(R.id.ibSource)
-    ImageButton ibSource;
-
-    @InjectView(R.id.ibDestination)
-    ImageButton ibDestination;
 
     private SimpleDateFormat dateFormatter;
     private Calendar         maxDate;
@@ -183,18 +177,12 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
         return true;
     }
 
-    @OnClick({ R.id.etDate, R.id.ibSource })
+    @OnClick({ R.id.etDate })
     public void onClick(View view)
     {
         switch (view.getId()) {
             case R.id.etDate:
                 dialogDatePicker.show();
-                break;
-            case R.id.ibSource:
-                Intent intent = new Intent(getSherlockActivity(), SourceActivity.class);
-                startActivityForResult(intent, 1);
-                break;
-            case R.id.ibDestination:
                 break;
         }
     }
@@ -471,31 +459,47 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
 
             OperationEntity operationEntity = new OperationEntity(date, OperationEntity.pos2type(type), source, destination, count, cost, comment);
 
-            String msg = "";
-            if (mainActivity.tmp_oper_id > 0) {
-                operationEntity.setId(mainActivity.tmp_oper_id);
+            double new_source_sum = Double.parseDouble(source.getSum_current()) - (operationEntity.getCost() * operationEntity.getCount());
 
-                if (dbHelper.getOperationDAO().updateOperation(operationEntity) > 0) {
-                    clearForm();
-                    msg = getString(R.string.msgSuccessUpdateOperation);
-                } else {
-                    msg = getString(R.string.msgErrorUpdateOperation);
-                }
+            if (new_source_sum < 0) {
+                Toast.makeText(getSherlockActivity(), getString(R.string.msgErrorEmptySource), Toast.LENGTH_SHORT).show();
             } else {
-                if (dbHelper.getOperationDAO().createOperation(operationEntity) > 0) {
-                    clearForm();
-                    msg = getString(R.string.msgSuccessAddOperation);
+                String msg = "";
+                if (mainActivity.tmp_oper_id > 0) {
+                    OperationEntity old_operation = dbHelper.getOperationDAO().queryForId(mainActivity.tmp_oper_id);
+                    double old_sum = old_operation.getCount() * old_operation.getCost();
+
+                    operationEntity.setId(mainActivity.tmp_oper_id);
+
+                    if (dbHelper.getOperationDAO().updateOperation(operationEntity) > 0) {
+
+                        source.setSum_current(String.valueOf(Double.parseDouble(source.getSum_current()) + old_sum - new_source_sum));
+                        dbHelper.getSourceDAO().update(source);
+
+                        clearForm();
+                        msg = getString(R.string.msgSuccessUpdateOperation);
+                    } else {
+                        msg = getString(R.string.msgErrorUpdateOperation);
+                    }
                 } else {
-                    msg = getString(R.string.msgErrorAddOperation);
+                    if (dbHelper.getOperationDAO().createOperation(operationEntity) > 0) {
+
+                        source.setSum_current(String.valueOf(new_source_sum));
+                        dbHelper.getSourceDAO().update(source);
+
+                        clearForm();
+                        msg = getString(R.string.msgSuccessAddOperation);
+                    } else {
+                        msg = getString(R.string.msgErrorAddOperation);
+                    }
+                }
+
+                Toast.makeText(getSherlockActivity(), msg, Toast.LENGTH_SHORT).show();
+
+                if (mainActivity.tmp_oper_id != 0) {
+                    mainActivity.tmp_oper_id = 0;
                 }
             }
-
-            Toast.makeText(getSherlockActivity(), msg, Toast.LENGTH_SHORT).show();
-
-            if (mainActivity.tmp_oper_id != 0) {
-                mainActivity.tmp_oper_id = 0;
-            }
-
         } catch (ParseException e) {
             e.printStackTrace();
         } catch (SQLException e) {

@@ -80,5 +80,6 @@
 
     <string name="msgErrorAddOperation">Ошибка при добавлении операции. Повторите пожалуйста попытку</string>
     <string name="msgErrorUpdateOperation">Ошибка при обновлении операции. Повторите пожалуйста попытку</string>
+    <string name="msgErrorEmptySource">Не хватает средств у источника</string>
 
 </resources>

@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import org.eatech.expense.fragments.FragmentBudgets;
 import org.eatech.expense.fragments.FragmentDestination;
 import org.eatech.expense.fragments.FragmentForm;
 import org.eatech.expense.fragments.FragmentOperations;
@@ -30,7 +29,6 @@ public class PagerAdapter extends FragmentStatePagerAdapter
             context.getString(R.string.screen_destinations),
             context.getString(R.string.action_add),
             context.getString(R.string.screen_operations),
-            context.getString(R.string.screen_budgets),
             context.getString(R.string.screen_reports)
         };
     }
@@ -53,9 +51,6 @@ public class PagerAdapter extends FragmentStatePagerAdapter
                 fragment = new FragmentOperations();
                 break;
             case 4:
-                fragment = new FragmentBudgets();
-                break;
-            case 5:
                 fragment = new FragmentReports();
                 break;
         }

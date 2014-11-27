@@ -31,7 +31,7 @@ public class SourceAdapter<S> extends ArrayAdapter<SourceEntity>
     {
         super(context, R.layout.sherlock_spinner_dropdown_item);
         this.context = context;
-        this.layout = R.layout.sherlock_spinner_dropdown_item;
+        this.layout = R.layout.listview_item;
     }
 
     @Override
@@ -51,15 +51,43 @@ public class SourceAdapter<S> extends ArrayAdapter<SourceEntity>
             holder = (ViewHolder) row.getTag();
         }
 
-        holder.text.setText(sourceEntity.getTitle());
+        holder.text1.setText(sourceEntity.getTitle());
+
+        return row;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
+        SourceEntity sourceEntity = getItem(position);
+        View row = convertView;
+        ViewHolder holder;
+
+        if (row == null) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            row = inflater.inflate(this.layout, parent, false);
+
+            holder = new ViewHolder(row);
+            row.setTag(holder);
+        } else {
+            holder = (ViewHolder) row.getTag();
+        }
+
+        holder.text1.setText(sourceEntity.getTitle());
+        if (sourceEntity.getId() > 0) {
+            holder.text2.setText(sourceEntity.getSum_current());
+        }
 
         return row;
     }
 
     static class ViewHolder
     {
-        @InjectView(android.R.id.text1)
-        TextView text;
+        @InjectView(R.id.text1)
+        TextView text1;
+
+        @InjectView(R.id.text2)
+        TextView text2;
 
         public ViewHolder(View view)
         {

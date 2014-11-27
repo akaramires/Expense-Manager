@@ -6,6 +6,7 @@
 package org.eatech.expense.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.eatech.expense.R;
+import org.eatech.expense.db.HelperFactory;
+import org.eatech.expense.db.dao.OperationDao;
 import org.eatech.expense.db.entities.DestinationEntity;
+import org.eatech.expense.db.entities.OperationEntity;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class ExpListAdapter extends BaseExpandableListAdapter
