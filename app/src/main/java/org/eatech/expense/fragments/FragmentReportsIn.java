@@ -38,8 +38,10 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -141,11 +143,26 @@ public class FragmentReportsIn extends SherlockFragment implements
             .and().eq(OperationEntity.COL_TYPE, "in")
             .query();
 
-        int index = 0;
+        HashMap<Integer, String> chartDataTitles = new HashMap<Integer, String>();
+        HashMap<Integer, Double> chartDataValues = new HashMap<Integer, Double>();
         for (OperationEntity operation : operations) {
-            float sum = Float.parseFloat(String.valueOf(operation.getCount() * operation.getCost()));
-            xVals.add(operation.getDestination().getTitle());
-            entries.add(new Entry(sum, index));
+            int key = operation.getDestination().getId();
+            String title = operation.getDestination().getTitle();
+            double sum = operation.getCount() * operation.getCost();
+
+            if (chartDataValues.containsKey(key)) {
+                chartDataValues.put(key, chartDataValues.get(key) + sum);
+            } else {
+                chartDataValues.put(key, sum);
+            }
+
+            chartDataTitles.put(key, title);
+        }
+
+        int index = 0;
+        for (Map.Entry<Integer, Double> entry : chartDataValues.entrySet()) {
+            xVals.add(chartDataTitles.get(entry.getKey()));
+            entries.add(new Entry(Float.parseFloat(entry.getValue().toString()), index));
 
             index++;
         }
