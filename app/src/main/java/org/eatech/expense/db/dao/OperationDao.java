@@ -66,7 +66,6 @@ public class OperationDao extends BaseDaoImpl<OperationEntity, Integer>
 
         return this.getAllByPeriodBuilder(date_start, date_end)
             .and().eq(OperationEntity.COL_SOURCE_ID, source_id)
-            .and().le(OperationEntity.COL_DATE, date_end)
             .query();
     }
 

@@ -5,13 +5,21 @@
 
 package org.eatech.expense.fragments;
 
+import android.app.DatePickerDialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragment;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
@@ -20,17 +28,51 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.utils.Legend;
 
+import org.eatech.expense.HelperDate;
 import org.eatech.expense.R;
+import org.eatech.expense.adapter.RangeDatePickerDialog;
+import org.eatech.expense.adapter.SourceAdapter;
+import org.eatech.expense.db.DatabaseHelper;
+import org.eatech.expense.db.HelperFactory;
+import org.eatech.expense.db.dao.OperationDao;
+import org.eatech.expense.db.entities.OperationEntity;
+import org.eatech.expense.db.entities.SourceEntity;
 
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
-public class FragmentReports extends Fragment
+public class FragmentReports extends SherlockFragment implements AdapterView.OnItemSelectedListener
 {
+    private static final String TAG = "Expense-" + FragmentReports.class.getSimpleName();
+
+    @InjectView(R.id.etStart)
+    EditText etStart;
+
+    @InjectView(R.id.etEnd)
+    EditText etEnd;
+
+    @InjectView(R.id.spinSource)
+    Spinner spinSource;
+
     @InjectView(R.id.chart)
     PieChart mChart;
+
+    private SimpleDateFormat            dateFormatter;
+    private Calendar                    date_start;
+    private Calendar                    date_end;
+    private RangeDatePickerDialog       dialogDatePickerStart;
+    private RangeDatePickerDialog       dialogDatePickerEnd;
+    private SourceAdapter<SourceEntity> adapterSource;
+    private DatabaseHelper              dbHelper;
+    private OperationDao                operationDao;
 
     public static Fragment newInstance()
     {
@@ -44,23 +86,32 @@ public class FragmentReports extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_reports, container, false);
         ButterKnife.inject(this, rootView);
 
-        mChart.setDescription("");
-        mChart.setUsePercentValues(true);
-        mChart.setCenterText("Quarterly\nRevenue");
-        mChart.setCenterTextSize(22f);
+        try {
+            dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+            dbHelper = HelperFactory.getInstance().getHelper();
+            operationDao = dbHelper.getOperationDAO();
 
-        // radius of the center hole in percent of maximum radius
-        mChart.setHoleRadius(45f);
-        mChart.setTransparentCircleRadius(50f);
+            initDateFilter();
+            initAdapterSource();
 
-        // enable / disable drawing of x- and y-values
-        //        mChart.setDrawYValues(false);
-        //        mChart.setDrawXValues(false);
+            mChart.setDescription("");
+            mChart.setUsePercentValues(false);
+            mChart.setCenterText("Расходы");
+            mChart.setCenterTextSize(22f);
+            mChart.setHoleRadius(45f);
+            mChart.setTransparentCircleRadius(50f);
 
-        mChart.setData(generatePieData());
+            try {
+                mChart.setData(getData());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
-        Legend l = mChart.getLegend();
-        l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
+            Legend l = mChart.getLegend();
+            l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return rootView;
     }
@@ -71,37 +122,121 @@ public class FragmentReports extends Fragment
         super.setUserVisibleHint(isVisibleToUser);
     }
 
-    /**
-     * generates less data (1 DataSet, 4 values)
-     *
-     * @return
-     */
-    protected PieData generatePieData()
+    @OnClick({ R.id.etStart, R.id.etEnd })
+    public void onClick(View view)
+    {
+        switch (view.getId()) {
+            case R.id.etStart:
+                dialogDatePickerStart.show();
+                break;
+            case R.id.etEnd:
+                dialogDatePickerEnd.show();
+                break;
+        }
+    }
+
+    protected PieData getData() throws SQLException
     {
 
-        int count = 4;
-
-        ArrayList<Entry> entries1 = new ArrayList<Entry>();
+        ArrayList<Entry> entries = new ArrayList<Entry>();
         ArrayList<String> xVals = new ArrayList<String>();
 
-        xVals.add("Quarter 1");
-        xVals.add("Quarter 2");
-        xVals.add("Quarter 3");
-        xVals.add("Quarter 4");
+        SourceEntity source = adapterSource.getItem(spinSource.getSelectedItemPosition());
 
-        entries1.add(new Entry(10, 0));
+        List<OperationEntity> operations = operationDao
+            .getAllByPeriodBuilder(date_start.getTimeInMillis(), date_end.getTimeInMillis())
+            .and().eq(OperationEntity.COL_SOURCE_ID, source.getId())
+            .and().eq(OperationEntity.COL_TYPE, "out")
+            .query();
 
-        entries1.add(new Entry(5, 1));
+        int index = 0;
+        for (OperationEntity operation : operations) {
+            float sum = Float.parseFloat(String.valueOf(operation.getCount() * operation.getCost()));
+            xVals.add(operation.getDestination().getTitle());
+            entries.add(new Entry(sum, index));
 
-        entries1.add(new Entry(25, 2));
+            index++;
+        }
 
-        entries1.add(new Entry(60, 3));
+        PieDataSet ds = new PieDataSet(entries, "");
+        ds.setColors(ColorTemplate.COLORFUL_COLORS);
+        ds.setSliceSpace(2f);
 
-        PieDataSet ds1 = new PieDataSet(entries1, "Quarterly Revenues 2014");
-        ds1.setColors(ColorTemplate.COLORFUL_COLORS);
-        ds1.setSliceSpace(2f);
+        return new PieData(xVals, ds);
+    }
 
-        PieData d = new PieData(xVals, ds1);
-        return d;
+    private void invalidateChart()
+    {
+        try {
+            mChart.setData(getData());
+            mChart.invalidate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initAdapterSource() throws SQLException
+    {
+        adapterSource = new SourceAdapter<SourceEntity>(getSherlockActivity());
+        adapterSource.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+
+        List<SourceEntity> sourceEntityList = dbHelper.getSourceDAO().getAll();
+        for (SourceEntity srcEntity : sourceEntityList) {
+            adapterSource.add(srcEntity);
+        }
+
+        spinSource.setAdapter(adapterSource);
+        spinSource.setSelection(0);
+        spinSource.setOnItemSelectedListener(this);
+    }
+
+    private void initDateFilter()
+    {
+        date_start = HelperDate.getStartCurrentMonthCal();
+        date_end = HelperDate.getEndCurrentMonthCal();
+
+        etStart.setText(dateFormatter.format(date_start.getTimeInMillis()));
+        etStart.setFocusable(false);
+        dialogDatePickerStart = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
+        {
+
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+            {
+                Calendar newDate = Calendar.getInstance();
+                newDate.set(year, monthOfYear, dayOfMonth);
+                date_start = dialogDatePickerEnd.minDate = newDate;
+                etStart.setText(dateFormatter.format(date_start.getTime()));
+
+                invalidateChart();
+            }
+        }, date_start, null, date_end);
+
+        etEnd.setText(dateFormatter.format(date_end.getTimeInMillis()));
+        etEnd.setFocusable(false);
+        dialogDatePickerEnd = new RangeDatePickerDialog(getSherlockActivity(), new DatePickerDialog.OnDateSetListener()
+        {
+
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+            {
+                Calendar newDate = Calendar.getInstance();
+                newDate.set(year, monthOfYear, dayOfMonth);
+                date_end = dialogDatePickerStart.maxDate = newDate;
+                etEnd.setText(dateFormatter.format(date_end.getTime()));
+
+                invalidateChart();
+            }
+        }, date_end, date_start, null);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+    {
+        invalidateChart();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView)
+    {
+
     }
 }
