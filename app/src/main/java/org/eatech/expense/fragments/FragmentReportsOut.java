@@ -6,10 +6,8 @@
 package org.eatech.expense.fragments;
 
 import android.app.DatePickerDialog;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +15,8 @@ import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
@@ -49,9 +45,10 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class FragmentReports extends SherlockFragment implements AdapterView.OnItemSelectedListener
+public class FragmentReportsOut extends SherlockFragment implements
+                                                         AdapterView.OnItemSelectedListener
 {
-    private static final String TAG = "Expense-" + FragmentReports.class.getSimpleName();
+    private static final String TAG = "Expense-" + FragmentReportsOut.class.getSimpleName();
 
     @InjectView(R.id.etStart)
     EditText etStart;
@@ -62,8 +59,8 @@ public class FragmentReports extends SherlockFragment implements AdapterView.OnI
     @InjectView(R.id.spinSource)
     Spinner spinSource;
 
-    @InjectView(R.id.chart)
-    PieChart mChart;
+    @InjectView(R.id.chartOut)
+    PieChart mChartOut;
 
     private SimpleDateFormat            dateFormatter;
     private Calendar                    date_start;
@@ -76,14 +73,14 @@ public class FragmentReports extends SherlockFragment implements AdapterView.OnI
 
     public static Fragment newInstance()
     {
-        return new FragmentReports();
+        return new FragmentReportsOut();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState)
     {
-        View rootView = inflater.inflate(R.layout.fragment_reports, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_reports_out, container, false);
         ButterKnife.inject(this, rootView);
 
         try {
@@ -94,20 +91,15 @@ public class FragmentReports extends SherlockFragment implements AdapterView.OnI
             initDateFilter();
             initAdapterSource();
 
-            mChart.setDescription("");
-            mChart.setUsePercentValues(false);
-            mChart.setCenterText("Расходы");
-            mChart.setCenterTextSize(22f);
-            mChart.setHoleRadius(45f);
-            mChart.setTransparentCircleRadius(50f);
+            mChartOut.setDescription("");
+            mChartOut.setUsePercentValues(false);
+            mChartOut.setCenterText("Расходы");
+            mChartOut.setCenterTextSize(22f);
+            mChartOut.setHoleRadius(45f);
+            mChartOut.setTransparentCircleRadius(50f);
+            mChartOut.setData(getData());
 
-            try {
-                mChart.setData(getData());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            Legend l = mChart.getLegend();
+            Legend l = mChartOut.getLegend();
             l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -168,8 +160,8 @@ public class FragmentReports extends SherlockFragment implements AdapterView.OnI
     private void invalidateChart()
     {
         try {
-            mChart.setData(getData());
-            mChart.invalidate();
+            mChartOut.setData(getData());
+            mChartOut.invalidate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

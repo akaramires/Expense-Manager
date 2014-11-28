@@ -13,6 +13,8 @@
     <string name="screen_budgets">Бюджеты</string>
     <string name="screen_report">Отчет</string>
     <string name="screen_reports">Отчеты</string>
+    <string name="screen_outs">Расходы</string>
+    <string name="screen_ins">Доходы</string>
     <string name="screen_source">Источник</string>
     <string name="screen_source_new">Новый источник</string>
     <string name="screen_sources">Источники</string>

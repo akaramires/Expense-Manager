@@ -460,6 +460,7 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
             OperationEntity operationEntity = new OperationEntity(date, OperationEntity.pos2type(type), source, destination, count, cost, comment);
 
             double new_source_sum = Double.parseDouble(source.getSum_current()) - (operationEntity.getCost() * operationEntity.getCount());
+            double new_source_sum_in = Double.parseDouble(source.getSum_current()) + (operationEntity.getCost() * operationEntity.getCount());
 
             if (new_source_sum < 0) {
                 Toast.makeText(getSherlockActivity(), getString(R.string.msgErrorEmptySource), Toast.LENGTH_SHORT).show();
@@ -469,12 +470,17 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
                     OperationEntity old_operation = dbHelper.getOperationDAO().queryForId(mainActivity.tmp_oper_id);
                     double old_sum = old_operation.getCount() * old_operation.getCost();
                     double new_sum_to_update = Double.parseDouble(source.getSum_current()) + old_sum - (operationEntity.getCost() * operationEntity.getCount());
+                    double new_sum_to_update_in = Double.parseDouble(source.getSum_current()) - old_sum + (operationEntity.getCost() * operationEntity.getCount());
 
                     operationEntity.setId(mainActivity.tmp_oper_id);
 
                     if (dbHelper.getOperationDAO().updateOperation(operationEntity) > 0) {
 
-                        source.setSum_current(String.valueOf(new_sum_to_update));
+                        if (type == 0) {
+                            source.setSum_current(String.valueOf(new_sum_to_update));
+                        } else {
+                            source.setSum_current(String.valueOf(new_sum_to_update_in));
+                        }
                         dbHelper.getSourceDAO().update(source);
 
                         clearForm();
@@ -485,7 +491,11 @@ public class FragmentForm extends SherlockFragment implements Validator.Validati
                 } else {
                     if (dbHelper.getOperationDAO().createOperation(operationEntity) > 0) {
 
-                        source.setSum_current(String.valueOf(new_source_sum));
+                        if (type == 0) {
+                            source.setSum_current(String.valueOf(new_source_sum));
+                        } else {
+                            source.setSum_current(String.valueOf(new_source_sum_in));
+                        }
                         dbHelper.getSourceDAO().update(source);
 
                         clearForm();
