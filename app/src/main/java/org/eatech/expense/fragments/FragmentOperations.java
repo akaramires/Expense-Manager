@@ -319,17 +319,9 @@ public class FragmentOperations extends SherlockListFragment implements
                         break;
                     case 1:
                         try {
-                            if (dbHelper.getSourceDAO().countOf() < 2) {
-                                Toast.makeText(getSherlockActivity(), getString(R.string.msgValidationRemoveLastSource), Toast.LENGTH_SHORT).show();
-                            } else {
-                                try {
-                                    operationDao.delete(operation);
-                                    setAdapter();
-                                    Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveOperation), Toast.LENGTH_SHORT).show();
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                            operationDao.delete(operation);
+                            setAdapter();
+                            Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveOperation), Toast.LENGTH_SHORT).show();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
