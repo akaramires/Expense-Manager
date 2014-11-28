@@ -13,9 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import org.eatech.expense.db.entities.CategoryEntity;
-import org.eatech.expense.db.entities.SourceEntity;
-
-import java.sql.SQLException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;

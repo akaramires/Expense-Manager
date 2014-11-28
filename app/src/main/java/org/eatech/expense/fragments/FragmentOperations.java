@@ -321,7 +321,7 @@ public class FragmentOperations extends SherlockListFragment implements
                         try {
                             SourceEntity source = dbHelper.getSourceDAO().queryForId(operation.getSource().getId());
                             double old = operation.getCount() * operation.getCost();
-                            source.setSum_current(String.valueOf(source.getSum_current() + old));
+                            source.setSum_current(String.valueOf((Double.parseDouble(source.getSum_current()) + old)));
                             dbHelper.getSourceDAO().update(source);
 
                             operationDao.delete(operation);

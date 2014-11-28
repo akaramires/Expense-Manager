@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
 import org.eatech.expense.R;
 import org.eatech.expense.db.entities.SourceEntity;
 
