@@ -319,6 +319,11 @@ public class FragmentOperations extends SherlockListFragment implements
                         break;
                     case 1:
                         try {
+                            SourceEntity source = dbHelper.getSourceDAO().queryForId(operation.getSource().getId());
+                            double old = operation.getCount() * operation.getCost();
+                            source.setSum_current(String.valueOf(source.getSum_current() + old));
+                            dbHelper.getSourceDAO().update(source);
+
                             operationDao.delete(operation);
                             setAdapter();
                             Toast.makeText(getSherlockActivity(), getString(R.string.msgSuccessRemoveOperation), Toast.LENGTH_SHORT).show();
