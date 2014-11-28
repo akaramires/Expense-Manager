@@ -33,7 +33,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
     private static final String TAG = "Expense-" + DatabaseHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME    = "expense.sqlite";
-    private static final int    DATABASE_VERSION = 9;
+    private static final int    DATABASE_VERSION = 10;
     private CurrencyDao    currencyDao;
     private SourceDao      sourceDao;
     private CategoryDao    categoryDao;
@@ -52,48 +52,33 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper
         try {
 
             TableUtils.createTable(connectionSource, CurrencyEntity.class);
-            database.execSQL("INSERT INTO `" + CurrencyEntity.TABLE_NAME + "` " +
-                "(`title`,             `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES " +
-                "('Доллар США',        'USD',  '$',           '',              0,         '" + curDate + "')," +
-                "('Евро',              'EUR',  '',            '€',             0,         '" + curDate + "')," +
-                "('Российский рубль',  'RUB',  '',            'руб.',          0,         '" + curDate + "')," +
-                "('Украинская гривна', 'UAH',  '',            '₴',             0,         '" + curDate + "')," +
-                "('Фунт стерлингов',   'GBP',  '£',           '',              0,         '" + curDate + "')" +
-                ";");
+            database.execSQL("INSERT INTO `" + CurrencyEntity.TABLE_NAME + "` (`title`, `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES ('Доллар США',        'USD', '$', '',     0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + CurrencyEntity.TABLE_NAME + "` (`title`, `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES ('Евро',              'EUR', '',  '€',    0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + CurrencyEntity.TABLE_NAME + "` (`title`, `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES ('Российский рубль',  'RUB', '',  'руб.', 0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + CurrencyEntity.TABLE_NAME + "` (`title`, `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES ('Украинская гривна', 'UAH', '',  '₴',    0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + CurrencyEntity.TABLE_NAME + "` (`title`, `code`, `symbol_left`, `symbol_right`, `editable`, `created_at`) VALUES ('Фунт стерлингов',   'GBP', '£', '',     0, '" + curDate + "');");
 
             TableUtils.createTable(connectionSource, SourceEntity.class);
-            database.execSQL("INSERT INTO `" + SourceEntity.TABLE_NAME + "` " +
-                "(`title`,       `sum_start`, `sum_current`, `created_at`,      `currency_id`) VALUES " +
-                "('Master Card', '500',       '500',         '" + curDate + "',  1)" +
-                ";");
+            database.execSQL("INSERT INTO `" + SourceEntity.TABLE_NAME + "` (`title`, `sum_start`, `sum_current`, `created_at`, `currency_id`) VALUES ('Master Card', '500', '500', '" + curDate + "', 1);");
 
             TableUtils.createTable(connectionSource, CategoryEntity.class);
-            database.execSQL("INSERT INTO `" + CategoryEntity.TABLE_NAME + "` " +
-                "(`title`,       `editable`, `created_at`) VALUES " +
-                "('Автомобиль',   0,         '" + curDate + "')," +
-                "('Еда',          0,         '" + curDate + "')," +
-                "('Работа',       0,         '" + curDate + "')" +
-                ";");
+            database.execSQL("INSERT INTO `" + CategoryEntity.TABLE_NAME + "` (`title`, `editable`, `created_at`) VALUES ('Автомобиль', 0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + CategoryEntity.TABLE_NAME + "` (`title`, `editable`, `created_at`) VALUES ('Еда',        0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + CategoryEntity.TABLE_NAME + "` (`title`, `editable`, `created_at`) VALUES ('Работа',     0, '" + curDate + "');");
 
             TableUtils.createTable(connectionSource, DestinationEntity.class);
-            database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` " +
-                "(`title`,    `category_id`, `type`, `editable`, `created_at`) VALUES " +
-                "('Бензин',   1,             'out',   0,         '" + curDate + "')," +
-                "('Хлеб',     2,             'out',   0,         '" + curDate + "')," +
-                "('Молоко',   2,             'out',   0,         '" + curDate + "')," +
-                "('Сахар',    2,             'out',   0,         '" + curDate + "')," +
-                "('Зарплата', 3,             'in',    0,         '" + curDate + "')" +
-                ";");
+            database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` (`title`, `category_id`, `type`, `editable`, `created_at`) VALUES ('Бензин',   1, 'out', 0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` (`title`, `category_id`, `type`, `editable`, `created_at`) VALUES ('Хлеб',     2, 'out', 0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` (`title`, `category_id`, `type`, `editable`, `created_at`) VALUES ('Молоко',   2, 'out', 0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` (`title`, `category_id`, `type`, `editable`, `created_at`) VALUES ('Сахар',    2, 'out', 0, '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + DestinationEntity.TABLE_NAME + "` (`title`, `category_id`, `type`, `editable`, `created_at`) VALUES ('Зарплата', 3, 'in',  0, '" + curDate + "');");
 
             TableUtils.createTable(connectionSource, OperationEntity.class);
-            database.execSQL("INSERT INTO `" + OperationEntity.TABLE_NAME + "` " +
-                "(`date`,            `type`, `source_id`, `destination_id`, `count`, `cost`,  `comment`, `created_at`) VALUES " +
-                "('" + curDate + "', 'out',   1,           1,                20,     '39',     '',       '" + curDate + "')," +
-                "('" + curDate + "', 'out',   1,           2,                3,      '10',     '',       '" + curDate + "')," +
-                "('" + curDate + "', 'out',   1,           3,                2,      '30.15',  '',       '" + curDate + "')," +
-                "('" + curDate + "', 'out',   1,           4,                1,      '41.44',  '',       '" + curDate + "')," +
-                "('" + curDate + "', 'in',    1,           5,                1,      '25000',  '',       '" + curDate + "')" +
-                ";");
+            database.execSQL("INSERT INTO `" + OperationEntity.TABLE_NAME + "` (`date`, `type`, `source_id`, `destination_id`, `count`, `cost`,  `comment`, `created_at`) VALUES ('" + curDate + "', 'out', 1, 1, 20, '39',    '', '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + OperationEntity.TABLE_NAME + "` (`date`, `type`, `source_id`, `destination_id`, `count`, `cost`,  `comment`, `created_at`) VALUES ('" + curDate + "', 'out', 1, 2, 3,  '10',    '', '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + OperationEntity.TABLE_NAME + "` (`date`, `type`, `source_id`, `destination_id`, `count`, `cost`,  `comment`, `created_at`) VALUES ('" + curDate + "', 'out', 1, 3, 2,  '30.15', '', '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + OperationEntity.TABLE_NAME + "` (`date`, `type`, `source_id`, `destination_id`, `count`, `cost`,  `comment`, `created_at`) VALUES ('" + curDate + "', 'out', 1, 4, 1,  '41.44', '', '" + curDate + "');");
+            database.execSQL("INSERT INTO `" + OperationEntity.TABLE_NAME + "` (`date`, `type`, `source_id`, `destination_id`, `count`, `cost`,  `comment`, `created_at`) VALUES ('" + curDate + "', 'in',  1, 5, 1,  '25000', '', '" + curDate + "');");
 
         } catch (SQLException e) {
             Log.e(TAG, "Error creating DB " + DATABASE_NAME);
